@@ -67,7 +67,7 @@
       padding: 20px;
     }
 
-    /* Banner / Search Box */
+    /* Search Box */
     .search-box {
       background: var(--card-bg);
       padding: 12px 18px;
@@ -87,7 +87,7 @@
       background: transparent;
     }
 
-    /* Categories */
+    /* Categories Filter */
     .categories {
       display: flex;
       gap: 10px;
@@ -319,7 +319,7 @@
     <!-- Category Filter -->
     <div class="categories">
       <button class="cat-btn active" onclick="filterCategory('all', this)">ทั้งหมด</button>
-      <button class="cat-btn" onclick="filterCategory('rice', this)">ข้าว / อาหารจานเดียว</button>
+      <button class="cat-btn" onclick="filterCategory('rice', this)">อาหารจานเดียว</button>
       <button class="cat-btn" onclick="filterCategory('drink', this)">เครื่องดื่ม</button>
       <button class="cat-btn" onclick="filterCategory('dessert', this)">ของหวาน</button>
     </div>
@@ -327,7 +327,7 @@
     <!-- Menu List -->
     <div class="section-title">เมนูแนะนำวันนี้</div>
     <div class="menu-grid" id="menuList">
-      <!-- JavaScript will populate items here -->
+      <!-- JavaScript จะนำรายการอาหารมาแสดงที่นี่ -->
     </div>
   </div>
 
@@ -340,7 +340,7 @@
     <div class="cart-checkout">ดูตะกร้าสินค้า ➔</div>
   </div>
 
-  <!-- Modal -->
+  <!-- Modal / Order Summary -->
   <div class="modal" id="orderModal">
     <div class="modal-content">
       <div class="modal-header">
@@ -348,7 +348,7 @@
         <button class="close-btn" onclick="closeModal()">✕</button>
       </div>
       <div class="cart-items" id="modalCartItems">
-        <!-- Cart Items -->
+        <!-- รายการสินค้าในตะกร้า -->
       </div>
       <hr style="border: none; border-top: 1px solid #eee; margin: 10px 0;">
       <div style="display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.9rem; color: #666;">
@@ -364,18 +364,37 @@
   </div>
 
   <script>
+    // รายการอาหารทั้งหมด (คุณสามารถเพิ่มเมนูใหม่ๆ ต่อท้ายได้เลยค่ะ)
     const products = [
+      // หมวดอาหารจานเดียว (rice)
       { id: 1, name: "ข้าวผัดกระเพราไข่ดาว", category: "rice", price: 65, desc: "กระเพราแท้ รสชาติเข้มข้น เผ็ดกำลังดี", img: "https://images.unsplash.com/photo-1589301760014-d929f3979dbc?w=300" },
-      { id: 2, name: "มัทฉะลาเต้เย็น", category: "drink", price: 55, desc: "ชาเขียวมัทฉะเกรดพรีเมียม นุ่มละมุน", img: "https://images.unsplash.com/photo-1536256263959-770b48d82b0a?w=300" },
-      { id: 3, name: "ข้าวหน้าไก่เทริยากิ", category: "rice", price: 79, desc: "ไก่นุ่ม ซอสเข้มข้นสไตล์ญี่ปุ่น", img: "https://images.unsplash.com/photo-1569058242253-92a9c755a0ec?w=300" },
-      { id: 4, name: "วาฟเฟิลฮงกง ฮันนี่", category: "dessert", price: 49, desc: "กรอบนอกนุ่มใน หอมกลิ่นน้ำผึ้งแท้", img: "https://images.unsplash.com/photo-1562376552-0d160a2f238d?w=300" }
+      { id: 2, name: "ข้าวหน้าไก่เทริยากิ", category: "rice", price: 79, desc: "ไก่นุ่ม ซอสเข้มข้นสไตล์ญี่ปุ่น", img: "https://images.unsplash.com/photo-1569058242253-92a9c755a0ec?w=300" },
+      { id: 3, name: "ข้าวหมูกระเทียมไข่ขยี้", category: "rice", price: 70, desc: "หมูนุ่มหอมกระเทียมพริกไทย เสิร์ฟพร้อมไข่ขยี้", img: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=300" },
+      { id: 4, name: "ข้าวไข่ข้นกุ้งสด", category: "rice", price: 85, desc: "ไข่นุ่มละมุนลิ้น กุ้งตัวโตเนื้อเด้ง", img: "https://images.unsplash.com/photo-1512058564366-18510be2db19?w=300" },
+
+      // หมวดเครื่องดื่ม (drink)
+      { id: 5, name: "มัทฉะลาเต้เย็น", category: "drink", price: 55, desc: "ชาเขียวมัทฉะเกรดพรีเมียม นุ่มละมุน", img: "https://images.unsplash.com/photo-1536256263959-770b48d82b0a?w=300" },
+      { id: 6, name: "อเมริกาโน่เย็น (Specialty)", category: "drink", price: 60, desc: "เมล็ดคั่วกลาง หอมกลิ่นผลไม้และช็อกโกแลต", img: "https://images.unsplash.com/photo-1517701604599-bb29b565090c?w=300" },
+      { id: 7, name: "ชาไทยเย็นสูตรเข้มข้น", category: "drink", price: 50, desc: "ชาไทยหอมเข้ม นมสดนุ่มลิ้น", img: "https://images.unsplash.com/photo-1556679343-c7306c1976bc?w=300" },
+
+      // หมวดของหวาน (dessert)
+      { id: 8, name: "วาฟเฟิลฮ่องกง ฮันนี่", category: "dessert", price: 49, desc: "กรอบนอกนุ่มใน หอมกลิ่นน้ำผึ้งแท้", img: "https://images.unsplash.com/photo-1562376552-0d160a2f238d?w=300" },
+      { id: 9, name: "พานาคอตต้าซอสสตอเบอร์รี่", category: "dessert", price: 65, desc: "เนื้อเนียนนุ่ม หวานซ่อนเปรี้ยวสดชื่น", img: "https://images.unsplash.com/photo-1488477181946-6428a0291777?w=300" },
+      { id: 10, name: "เค้กช็อกโกแลตหน้านุ่ม", category: "dessert", price: 75, desc: "ช็อกโกแลตเข้มข้น ไม่หวานเกินไป", img: "https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=300" }
     ];
 
     let cart = [];
+    let currentCategory = 'all';
 
     function renderMenu(items) {
       const menuContainer = document.getElementById("menuList");
       menuContainer.innerHTML = "";
+      
+      if (items.length === 0) {
+        menuContainer.innerHTML = `<div style="text-align: center; color: var(--text-muted); padding: 40px 0;">ไม่พบรายการอาหารที่ค้นหา</div>`;
+        return;
+      }
+
       items.forEach(item => {
         menuContainer.innerHTML += `
           <div class="food-card">
@@ -452,14 +471,31 @@
     function filterCategory(cat, btn) {
       document.querySelectorAll(".cat-btn").forEach(b => b.classList.remove("active"));
       btn.classList.add("active");
-      if (cat === "all") {
-        renderMenu(products);
-      } else {
-        renderMenu(products.filter(p => p.category === cat));
-      }
+      currentCategory = cat;
+      applyFilters();
     }
 
-    // Initialize
+    // ระบบค้นหาเมนูตามคีย์เวิร์ด
+    document.getElementById("searchInput").addEventListener("input", function(e) {
+      applyFilters();
+    });
+
+    function applyFilters() {
+      const searchKeyword = document.getElementById("searchInput").value.toLowerCase();
+      let filtered = products;
+
+      if (currentCategory !== 'all') {
+        filtered = filtered.filter(p => p.category === currentCategory);
+      }
+
+      if (searchKeyword.trim() !== "") {
+        filtered = filtered.filter(p => p.name.toLowerCase().includes(searchKeyword) || p.desc.toLowerCase().includes(searchKeyword));
+      }
+
+      renderMenu(filtered);
+    }
+
+    // เริ่มต้นแสดงผลรายการอาหารทั้งหมด
     renderMenu(products);
   </script>
 </body>
