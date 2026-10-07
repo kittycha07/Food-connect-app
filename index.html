@@ -3,11 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Food Connect - สั่งอาหารออนไลน์</title>
+  <title>Food Connect - Super App</title>
   <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <!-- Firebase SDKs -->
-  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
   <style>
     :root {
       --bg-color: #f8f9fa;
@@ -24,15 +21,24 @@
     body { background-color: var(--bg-color); color: var(--text-main); padding-bottom: 100px; }
     header { background: var(--card-bg); padding: 16px 24px; position: sticky; top: 0; z-index: 10; box-shadow: 0 2px 10px rgba(0,0,0,0.02); display: flex; justify-content: space-between; align-items: center; }
     .brand { font-size: 1.4rem; font-weight: 600; color: var(--primary); letter-spacing: -0.5px; }
+    .header-btns { display: flex; gap: 8px; align-items: center; }
+    .partner-btn { background: #fff; border: 1px solid var(--primary); color: var(--primary); padding: 6px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 500; cursor: pointer; }
     .user-profile { display: flex; align-items: center; gap: 8px; font-size: 0.85rem; background: var(--primary-light); padding: 6px 12px; border-radius: 20px; color: var(--primary); font-weight: 500; }
-    .auth-btn { background: var(--primary); color: white; border: none; padding: 6px 14px; border-radius: 20px; font-size: 0.85rem; cursor: pointer; font-family: 'Prompt', sans-serif; }
+    .auth-btn { background: var(--primary); color: white; border: none; padding: 6px 14px; border-radius: 20px; font-size: 0.85rem; cursor: pointer; }
     .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+    
+    /* Service Tabs */
+    .services-nav { display: flex; gap: 10px; margin-bottom: 20px; background: #fff; padding: 6px; border-radius: 20px; border: 1px solid var(--border-color); }
+    .service-tab { flex: 1; padding: 10px; text-align: center; border-radius: 14px; border: none; background: transparent; font-size: 0.9rem; font-weight: 500; color: var(--text-muted); cursor: pointer; transition: all 0.2s; }
+    .service-tab.active { background: var(--primary); color: white; }
+
     .search-box { background: var(--card-bg); padding: 12px 18px; border-radius: var(--radius); border: 1px solid var(--border-color); margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
     .search-box input { border: none; outline: none; width: 100%; font-size: 0.95rem; background: transparent; }
     .categories { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 10px; margin-bottom: 24px; scrollbar-width: none; }
     .categories::-webkit-scrollbar { display: none; }
-    .cat-btn { background: var(--card-bg); border: 1px solid var(--border-color); padding: 8px 18px; border-radius: 30px; font-size: 0.9rem; color: var(--text-muted); cursor: pointer; white-space: nowrap; transition: all 0.2s; }
+    .cat-btn { background: var(--card-bg); border: 1px solid var(--border-color); padding: 8px 18px; border-radius: 30px; font-size: 0.9rem; color: var(--text-muted); cursor: pointer; white-space: nowrap; }
     .cat-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+    
     .menu-grid { display: flex; flex-direction: column; gap: 14px; }
     .food-card { background: var(--card-bg); border-radius: var(--radius); padding: 14px; display: flex; gap: 14px; box-shadow: var(--shadow); border: 1px solid var(--border-color); }
     .food-img { width: 90px; height: 90px; border-radius: 12px; object-fit: cover; background: #f0f0f0; }
@@ -42,46 +48,140 @@
     .food-bottom { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; }
     .food-price { font-weight: 600; font-size: 0.95rem; color: var(--primary); }
     .add-btn { background: var(--primary-light); color: var(--primary); border: none; padding: 6px 14px; border-radius: 20px; font-weight: 500; font-size: 0.85rem; cursor: pointer; }
+    
     .cart-bar { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); width: calc(100% - 40px); max-width: 560px; background: var(--primary); color: white; padding: 14px 20px; border-radius: 20px; box-shadow: 0 10px 25px rgba(74, 124, 89, 0.3); display: none; justify-content: space-between; align-items: center; cursor: pointer; z-index: 100; }
+    
     .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); backdrop-filter: blur(4px); z-index: 200; align-items: flex-end; justify-content: center; }
-    .modal-content { background: white; width: 100%; max-width: 600px; border-radius: 24px 24px 0 0; padding: 24px; max-height: 85vh; overflow-y: auto; }
-    .input-group { margin-bottom: 14px; text-align: left; }
+    .modal-content { background: white; width: 100%; max-width: 600px; border-radius: 24px 24px 0 0; padding: 24px; max-height: 85vh; overflow-y: auto; text-align: left; }
+    .input-group { margin-bottom: 14px; }
     .input-group label { display: block; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 4px; }
     .input-group input, .input-group select { width: 100%; padding: 10px 14px; border-radius: 10px; border: 1px solid var(--border-color); font-size: 0.95rem; outline: none; }
     .order-btn { width: 100%; background: var(--primary); color: white; border: none; padding: 14px; border-radius: 14px; font-size: 1rem; font-weight: 500; cursor: pointer; margin-top: 10px; }
+    
+    .qr-container { text-align: center; margin: 20px 0; padding: 16px; background: #f9f9f9; border-radius: 16px; }
+    .qr-img { width: 180px; height: 180px; margin: 0 auto; border-radius: 12px; border: 1px solid #eee; display: block; }
   </style>
 </head>
 <body>
 
   <header>
     <div class="brand">Food Connect.</div>
-    <div id="authContainer">
-      <button class="auth-btn" onclick="openAuthModal('login')">เข้าสู่ระบบ</button>
+    <div class="header-btns">
+      <button class="partner-btn" onclick="openPartnerModal()">🛵 สมัครไรเดอร์</button>
+      <div id="authContainer">
+        <button class="auth-btn" onclick="openAuthModal('login')">เข้าสู่ระบบ</button>
+      </div>
     </div>
   </header>
 
   <div class="container">
-    <div class="search-box">
-      <span>🔍</span>
-      <input type="text" placeholder="ค้นหาเมนูอร่อย..." id="searchInput">
+    <!-- Service Selector Nav -->
+    <div class="services-nav">
+      <button class="service-tab active" onclick="switchService('food', this)">🍔 สั่งอาหาร</button>
+      <button class="service-tab" onclick="switchService('ride', this)">🚗 เรียกรถ</button>
+      <button class="service-tab" onclick="switchService('parcel', this)">📦 ส่งพัสดุ</button>
     </div>
 
-    <div class="categories">
-      <button class="cat-btn active" onclick="filterCategory('all', this)">ทั้งหมด</button>
-      <button class="cat-btn" onclick="filterCategory('rice', this)">อาหารจานเดียว</button>
-      <button class="cat-btn" onclick="filterCategory('drink', this)">เครื่องดื่ม</button>
-      <button class="cat-btn" onclick="filterCategory('dessert', this)">ของหวาน</button>
+    <!-- Food Section -->
+    <div id="foodSection">
+      <div class="search-box">
+        <span>🔍</span>
+        <input type="text" placeholder="ค้นหาเมนูอร่อย..." id="searchInput">
+      </div>
+
+      <div class="categories">
+        <button class="cat-btn active" onclick="filterCategory('all', this)">ทั้งหมด</button>
+        <button class="cat-btn" onclick="filterCategory('rice', this)">อาหารจานเดียว</button>
+        <button class="cat-btn" onclick="filterCategory('drink', this)">เครื่องดื่ม</button>
+        <button class="cat-btn" onclick="filterCategory('dessert', this)">ของหวาน</button>
+      </div>
+
+      <div class="menu-grid" id="menuList"></div>
     </div>
 
-    <div class="menu-grid" id="menuList"></div>
+    <!-- Ride Section -->
+    <div id="rideSection" style="display:none;">
+      <div style="background:#fff; padding:20px; border-radius:var(--radius); border:1px solid var(--border-color);">
+        <h3 style="margin-bottom:14px;">เรียกเดินทาง (Connect Ride)</h3>
+        <div class="input-group">
+          <label>จุดรับ</label>
+          <input type="text" placeholder="ตำแหน่งปัจจุบันของคุณ">
+        </div>
+        <div class="input-group">
+          <label>จุดส่ง</label>
+          <input type="text" placeholder="ระบุจุดหมายปลายทาง">
+        </div>
+        <button class="order-btn" onclick="alert('กำลังค้นหาคนขับบริเวณใกล้เคียง...')">เรียก รถยนต์ / มอเตอร์ไซค์</button>
+      </div>
+    </div>
+
+    <!-- Parcel Section -->
+    <div id="parcelSection" style="display:none;">
+      <div style="background:#fff; padding:20px; border-radius:var(--radius); border:1px solid var(--border-color);">
+        <h3 style="margin-bottom:14px;">ส่งพัสดุด่วน (Connect Parcel)</h3>
+        <div class="input-group">
+          <label>ชื่อและเบอร์ผู้ส่ง</label>
+          <input type="text" placeholder="ชื่อ - เบอร์โทรศัพท์">
+        </div>
+        <div class="input-group">
+          <label>ชื่อและเบอร์ผู้รับ</label>
+          <input type="text" placeholder="ชื่อ - เบอร์โทรศัพท์ผู้รับ">
+        </div>
+        <div class="input-group">
+          <label>ขนาดพัสดุ</label>
+          <select>
+            <option>ซองเอกสาร / ขนาดเล็ก (฿35)</option>
+            <option>กล่องขนาดกลาง (฿65)</option>
+            <option>กล่องขนาดใหญ่ (฿110)</option>
+          </select>
+        </div>
+        <button class="order-btn" onclick="alert('เรียกรถรับพัสดุเรียบร้อยแล้ว!')">เรียกรถรับพัสดุ</button>
+      </div>
+    </div>
+
   </div>
 
+  <!-- Cart Bar -->
   <div class="cart-bar" id="cartBar" onclick="openCartModal()">
     <div style="display: flex; align-items: center; gap: 10px;">
       <span style="background: rgba(255,255,255,0.2); padding: 4px 10px; border-radius: 12px; font-size: 0.85rem;" id="cartCount">0 รายการ</span>
       <span id="cartTotalPrice">฿0</span>
     </div>
     <div>ดูตะกร้าสินค้า ➔</div>
+  </div>
+
+  <!-- Partner QR Modal -->
+  <div class="modal" id="partnerModal">
+    <div class="modal-content">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+        <h3>สมัครเป็นไรเดอร์ / พาร์ทเนอร์</h3>
+        <button onclick="closeModal('partnerModal')" style="background:#f0f0f0; border:none; width:32px; height:32px; border-radius:50%; cursor:pointer;">✕</button>
+      </div>
+      <p style="font-size: 0.85rem; color: var(--text-muted);">สแกน QR Code ด้านล่างนี้เพื่อเปิดหน้าสมัคร หรือกรอกข้อมูลผ่านแบบฟอร์มได้ทันที</p>
+      
+      <div class="qr-container">
+        <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://food-connect-rider-register.com" class="qr-img" alt="Rider Register QR">
+        <div style="margin-top:8px; font-size:0.8rem; color:var(--primary); font-weight:500;">สแกนเพื่อสมัครพาร์ทเนอร์ Food Connect</div>
+      </div>
+
+      <div class="input-group">
+        <label>ชื่อ-นามสกุล</label>
+        <input type="text" placeholder="ระบุชื่อจริง-นามสกุล">
+      </div>
+      <div class="input-group">
+        <label>เบอร์โทรศัพท์</label>
+        <input type="tel" placeholder="08X-XXX-XXXX">
+      </div>
+      <div class="input-group">
+        <label>ประเภทยานพาหนะ</label>
+        <select>
+          <option>รถจักรยานยนต์</option>
+          <option>รถยนต์ส่วนบุคคล</option>
+          <option>ร้านค้าพาร์ทเนอร์</option>
+        </select>
+      </div>
+      <button class="order-btn" onclick="alert('ยื่นใบสมัครเรียบร้อยแล้ว! เจ้าหน้าที่จะติดต่อกลับภายใน 24 ชม.'); closeModal('partnerModal');">ส่งใบสมัคร</button>
+    </div>
   </div>
 
   <!-- Auth Modal -->
@@ -91,27 +191,15 @@
         <h3 id="authTitle">เข้าสู่ระบบ</h3>
         <button onclick="closeModal('authModal')" style="background:#f0f0f0; border:none; width:32px; height:32px; border-radius:50%; cursor:pointer;">✕</button>
       </div>
-      
-      <div id="authForm">
-        <div class="input-group" id="nameField" style="display:none;">
-          <label>ชื่อผู้ใช้งาน</label>
-          <input type="text" id="regName" placeholder="เช่น สมชาย ใจดี">
-        </div>
-        <div class="input-group">
-          <label>อีเมล</label>
-          <input type="email" id="authEmail" placeholder="example@email.com">
-        </div>
-        <div class="input-group">
-          <label>รหัสผ่าน</label>
-          <input type="password" id="authPassword" placeholder="อย่างน้อย 6 ตัวอักษร">
-        </div>
-        <button class="order-btn" id="authSubmitBtn" onclick="handleAuth()">เข้าสู่ระบบ</button>
+      <div class="input-group">
+        <label>อีเมล</label>
+        <input type="email" id="authEmail" placeholder="example@email.com">
       </div>
-
-      <div style="text-align: center; margin-top: 16px; font-size: 0.85rem; color: var(--text-muted);">
-        <span id="authToggleText">ยังไม่มีบัญชีใช่ไหม?</span>
-        <a href="#" id="authToggleLink" onclick="toggleAuthMode()" style="color: var(--primary); font-weight: 600; text-decoration: none;">สมัครสมาชิก</a>
+      <div class="input-group">
+        <label>รหัสผ่าน</label>
+        <input type="password" id="authPassword" placeholder="อย่างน้อย 6 ตัวอักษร">
       </div>
+      <button class="order-btn" onclick="handleAuth()">เข้าสู่ระบบ</button>
     </div>
   </div>
 
@@ -124,16 +212,10 @@
       </div>
       <div id="modalCartItems"></div>
       <hr style="border: none; border-top: 1px solid #eee; margin: 14px 0;">
-      
       <div class="input-group">
         <label>ที่อยู่จัดส่ง</label>
         <input type="text" id="deliveryAddress" placeholder="ระบุบ้านเลขที่ ซอย ถนน">
       </div>
-      <div class="input-group">
-        <label>เบอร์โทรศัพท์</label>
-        <input type="tel" id="deliveryPhone" placeholder="08X-XXX-XXXX">
-      </div>
-      
       <div style="display: flex; justify-content: space-between; font-weight: 600; font-size: 1.1rem; margin: 16px 0 8px;">
         <span>รวมทั้งหมด (รวมค่าส่ง ฿15)</span>
         <span id="modalGrandTotal">฿0</span>
@@ -141,46 +223,22 @@
       <button class="order-btn" onclick="confirmOrder()">ยืนยันการสั่งซื้อ</button>
     </div>
   </div>
-  <script>
-    // Firebase Config (Demo Mode)
-    const firebaseConfig = {
-      apiKey: "AIzaSyDemoKeyForFoodConnectWebApp2026",
-      authDomain: "food-connect-demo.firebaseapp.com",
-      projectId: "food-connect-demo"
-    };
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
 
+  <script>
+    // รายการอาหาร (ตัดต้มยำกุ้งออกแล้ว)
     const products = [
       { id: 1, name: "ข้าวผัดกระเพราไข่ดาว", category: "rice", price: 65, desc: "กระเพราแท้ รสชาติเข้มข้น เผ็ดกำลังดี", img: "https://images.unsplash.com/photo-1589301760014-d929f3979dbc?w=300" },
       { id: 2, name: "ข้าวหน้าไก่เทริยากิ", category: "rice", price: 79, desc: "ไก่นุ่ม ซอสเข้มข้นสไตล์ญี่ปุ่น", img: "https://images.unsplash.com/photo-1569058242253-92a9c755a0ec?w=300" },
-      { id: 3, name: "ข้าวหมูกระเทียมไข่ขยี้", category: "rice", price: 70, desc: "หมูนุ่มหอมกระเทียมพริกไทย", img: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=300" },
-      { id: 4, name: "มัทฉะลาเต้เย็น", category: "drink", price: 55, desc: "ชาเขียวมัทฉะเกรดพรีเมียม นุ่มละมุน", img: "https://images.unsplash.com/photo-1536256263959-770b48d82b0a?w=300" },
-      { id: 5, name: "อเมริกาโน่เย็น", category: "drink", price: 60, desc: "เมล็ดคั่วกลาง หอมกลิ่นผลไม้", img: "https://images.unsplash.com/photo-1517701604599-bb29b565090c?w=300" },
-      { id: 6, name: "วาฟเฟิลฮ่องกง ฮันนี่", category: "dessert", price: 49, desc: "กรอบนอกนุ่มใน หอมกลิ่นน้ำผึ้งแท้", img: "https://images.unsplash.com/photo-1562376552-0d160a2f238d?w=300" }
+      { id: 4, name: "ผัดไทยกุ้งสด", category: "rice", price: 85, desc: "ผัดไทยเส้นจันทน์ เหนียวนุ่ม ซอสมะขามเข้มข้น", img: "https://images.unsplash.com/photo-1559847844-5315695dadae?w=300" },
+      { id: 5, name: "สปาเก็ตตี้คาโบนาร่า", category: "rice", price: 120, desc: "เข้มข้นหอมมัน เบคอนกรอบพรีเมียม", img: "https://images.unsplash.com/photo-1612874742237-6526221588e3?w=300" },
+      { id: 6, name: "มัทฉะลาเต้เย็น", category: "drink", price: 55, desc: "ชาเขียวมัทฉะเกรดพรีเมียม นุ่มละมุน", img: "https://images.unsplash.com/photo-1536256263959-770b48d82b0a?w=300" },
+      { id: 7, name: "อเมริกาโน่เย็น", category: "drink", price: 60, desc: "เมล็ดคั่วกลาง หอมกลิ่นผลไม้", img: "https://images.unsplash.com/photo-1517701604599-bb29b565090c?w=300" },
+      { id: 8, name: "วาฟเฟิลฮ่องกง ฮันนี่", category: "dessert", price: 49, desc: "กรอบนอกนุ่มใน หอมกลิ่นน้ำผึ้งแท้", img: "https://images.unsplash.com/photo-1562376552-0d160a2f238d?w=300" }
     ];
 
     let cart = [];
     let currentCategory = 'all';
-    let isLoginMode = true;
     let currentUser = null;
-
-    // Listen to Auth State
-    auth.onAuthStateChanged(user => {
-      currentUser = user;
-      const authContainer = document.getElementById('authContainer');
-      if (user) {
-        const name = user.displayName || user.email.split('@')[0];
-        authContainer.innerHTML = `
-          <div class="user-profile">
-            👤 ${name}
-            <span onclick="logout()" style="cursor:pointer; margin-left:6px; opacity:0.7;">(ออก)</span>
-          </div>
-        `;
-      } else {
-        authContainer.innerHTML = `<button class="auth-btn" onclick="openAuthModal('login')">เข้าสู่ระบบ</button>`;
-      }
-    });
 
     function renderMenu(items) {
       const menuContainer = document.getElementById("menuList");
@@ -226,63 +284,27 @@
       }
     }
 
-    function openAuthModal(mode) {
-      isLoginMode = mode === 'login';
-      updateAuthUI();
-      document.getElementById('authModal').style.display = 'flex';
+    function switchService(service, btn) {
+      document.querySelectorAll('.service-tab').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('foodSection').style.display = service === 'food' ? 'block' : 'none';
+      document.getElementById('rideSection').style.display = service === 'ride' ? 'block' : 'none';
+      document.getElementById('parcelSection').style.display = service === 'parcel' ? 'block' : 'none';
+      if(service !== 'food') document.getElementById('cartBar').style.display = 'none';
+      else updateCartUI();
     }
 
-    function toggleAuthMode() {
-      isLoginMode = !isLoginMode;
-      updateAuthUI();
-    }
-
-    function updateAuthUI() {
-      document.getElementById('authTitle').innerText = isLoginMode ? "เข้าสู่ระบบ" : "สมัครสมาชิก";
-      document.getElementById('nameField').style.display = isLoginMode ? "none" : "block";
-      document.getElementById('authSubmitBtn').innerText = isLoginMode ? "เข้าสู่ระบบ" : "สมัครสมาชิก";
-      document.getElementById('authToggleText').innerText = isLoginMode ? "ยังไม่มีบัญชีใช่ไหม?" : "มีบัญชีอยู่แล้ว?";
-      document.getElementById('authToggleLink').innerText = isLoginMode ? "สมัครสมาชิก" : "เข้าสู่ระบบ";
-    }
+    function openPartnerModal() { document.getElementById('partnerModal').style.display = 'flex'; }
+    function openAuthModal() { document.getElementById('authModal').style.display = 'flex'; }
+    function closeModal(id) { document.getElementById(id).style.display = 'none'; }
 
     function handleAuth() {
       const email = document.getElementById('authEmail').value;
-      const password = document.getElementById('authPassword').value;
-      const name = document.getElementById('regName').value;
-
-      if (!email || !password) {
-        alert("กรุณากรอกข้อมูลให้ครบถ้วน");
-        return;
-      }
-
-      if (isLoginMode) {
-        // Mock login for smooth demo
-        currentUser = { email: email, displayName: email.split('@')[0] };
-        document.getElementById('authContainer').innerHTML = `
-          <div class="user-profile">
-            👤 ${currentUser.displayName}
-            <span onclick="logout()" style="cursor:pointer; margin-left:6px; opacity:0.7;">(ออก)</span>
-          </div>
-        `;
-        alert("เข้าสู่ระบบสำเร็จ!");
-        closeModal('authModal');
-      } else {
-        currentUser = { email: email, displayName: name || email.split('@')[0] };
-        document.getElementById('authContainer').innerHTML = `
-          <div class="user-profile">
-            👤 ${currentUser.displayName}
-            <span onclick="logout()" style="cursor:pointer; margin-left:6px; opacity:0.7;">(ออก)</span>
-          </div>
-        `;
-        alert("สมัครสมาชิกสำเร็จ!");
-        closeModal('authModal');
-      }
-    }
-
-    function logout() {
-      currentUser = null;
-      document.getElementById('authContainer').innerHTML = `<button class="auth-btn" onclick="openAuthModal('login')">เข้าสู่ระบบ</button>`;
-      alert("ออกจากระบบเรียบร้อยแล้ว");
+      if (!email) return alert('กรุณากรอกอีเมล');
+      currentUser = { email: email, displayName: email.split('@')[0] };
+      document.getElementById('authContainer').innerHTML = `<div class="user-profile">👤 ${currentUser.displayName}</div>`;
+      alert('เข้าสู่ระบบสำเร็จ!');
+      closeModal('authModal');
     }
 
     function openCartModal() {
@@ -291,34 +313,17 @@
       let total = 0;
       cart.forEach((item) => {
         total += item.price;
-        modalItems.innerHTML += `
-          <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
-            <span>${item.name}</span>
-            <span>฿${item.price}</span>
-          </div>
-        `;
+        modalItems.innerHTML += `<div style="display:flex; justify-content:space-between; margin-bottom:8px;"><span>${item.name}</span><span>฿${item.price}</span></div>`;
       });
       document.getElementById("modalGrandTotal").innerText = `฿${total + 15}`;
       document.getElementById("cartModal").style.display = "flex";
     }
 
-    function closeModal(id) {
-      document.getElementById(id).style.display = "none";
-    }
-
     function confirmOrder() {
-      if (!currentUser) {
-        alert("กรุณาเข้าสู่ระบบก่อนทำการสั่งซื้อค่ะ");
-        closeModal('cartModal');
-        openAuthModal('login');
-        return;
-      }
-      const address = document.getElementById('deliveryAddress').value;
-      if (!address) {
-        alert("กรุณาระบุที่อยู่จัดส่งด้วยค่ะ");
-        return;
-      }
-      alert(`🎉 ขอบคุณสำหรับการสั่งซื้อคุณ ${currentUser.displayName}!\nระบบกำลังนำส่งไปที่: ${address}`);
+      if (!currentUser) return (alert('กรุณาเข้าสู่ระบบก่อนสั่งซื้อ'), closeModal('cartModal'), openAuthModal());
+      const addr = document.getElementById('deliveryAddress').value;
+      if (!addr) return alert('กรุณาระบุที่อยู่จัดส่ง');
+      alert(`🎉 ขอบคุณสำหรับการสั่งซื้อคุณ ${currentUser.displayName}!\nจัดส่งไปที่: ${addr}`);
       cart = [];
       updateCartUI();
       closeModal('cartModal');
