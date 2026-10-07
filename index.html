@@ -5,11 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Food Connect - สั่งอาหารออนไลน์</title>
   <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
   <style>
     :root {
       --bg-color: #f8f9fa;
       --card-bg: #ffffff;
-      --primary: #4a7c59; /* สีเขียวมินิมอล Sage Green */
+      --primary: #4a7c59;
       --primary-light: #e8f0eb;
       --text-main: #2b2b2b;
       --text-muted: #7d7d7d;
@@ -17,306 +20,52 @@
       --radius: 16px;
       --shadow: 0 4px 20px rgba(0,0,0,0.04);
     }
-
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: 'Prompt', sans-serif;
-      -webkit-tap-highlight-color: transparent;
-    }
-
-    body {
-      background-color: var(--bg-color);
-      color: var(--text-main);
-      padding-bottom: 100px;
-    }
-
-    /* Header */
-    header {
-      background: var(--card-bg);
-      padding: 20px 24px;
-      position: sticky;
-      top: 0;
-      z-index: 10;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.02);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .brand {
-      font-size: 1.4rem;
-      font-weight: 600;
-      color: var(--primary);
-      letter-spacing: -0.5px;
-    }
-
-    .location {
-      font-size: 0.85rem;
-      color: var(--text-muted);
-      display: flex;
-      align-items: center;
-      gap: 4px;
-    }
-
-    /* Main Container */
-    .container {
-      max-width: 600px;
-      margin: 0 auto;
-      padding: 20px;
-    }
-
-    /* Search Box */
-    .search-box {
-      background: var(--card-bg);
-      padding: 12px 18px;
-      border-radius: var(--radius);
-      border: 1px solid var(--border-color);
-      margin-bottom: 20px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .search-box input {
-      border: none;
-      outline: none;
-      width: 100%;
-      font-size: 0.95rem;
-      background: transparent;
-    }
-
-    /* Categories Filter */
-    .categories {
-      display: flex;
-      gap: 10px;
-      overflow-x: auto;
-      padding-bottom: 10px;
-      margin-bottom: 24px;
-      scrollbar-width: none;
-    }
-
-    .categories::-webkit-scrollbar {
-      display: none;
-    }
-
-    .cat-btn {
-      background: var(--card-bg);
-      border: 1px solid var(--border-color);
-      padding: 8px 18px;
-      border-radius: 30px;
-      font-size: 0.9rem;
-      color: var(--text-muted);
-      cursor: pointer;
-      white-space: nowrap;
-      transition: all 0.2s ease;
-    }
-
-    .cat-btn.active {
-      background: var(--primary);
-      color: white;
-      border-color: var(--primary);
-    }
-
-    /* Menu List */
-    .section-title {
-      font-size: 1.1rem;
-      font-weight: 500;
-      margin-bottom: 14px;
-    }
-
-    .menu-grid {
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-    }
-
-    .food-card {
-      background: var(--card-bg);
-      border-radius: var(--radius);
-      padding: 14px;
-      display: flex;
-      gap: 14px;
-      box-shadow: var(--shadow);
-      border: 1px solid var(--border-color);
-      transition: transform 0.2s ease;
-    }
-
-    .food-img {
-      width: 90px;
-      height: 90px;
-      border-radius: 12px;
-      object-fit: cover;
-      background: #f0f0f0;
-    }
-
-    .food-info {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-    }
-
-    .food-name {
-      font-size: 1rem;
-      font-weight: 500;
-    }
-
-    .food-desc {
-      font-size: 0.8rem;
-      color: var(--text-muted);
-      margin-top: 2px;
-    }
-
-    .food-bottom {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-top: 8px;
-    }
-
-    .food-price {
-      font-weight: 600;
-      font-size: 0.95rem;
-      color: var(--primary);
-    }
-
-    .add-btn {
-      background: var(--primary-light);
-      color: var(--primary);
-      border: none;
-      padding: 6px 14px;
-      border-radius: 20px;
-      font-weight: 500;
-      font-size: 0.85rem;
-      cursor: pointer;
-      transition: background 0.2s;
-    }
-
-    .add-btn:active {
-      transform: scale(0.95);
-    }
-
-    /* Floating Cart Bar */
-    .cart-bar {
-      position: fixed;
-      bottom: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: calc(100% - 40px);
-      max-width: 560px;
-      background: var(--primary);
-      color: white;
-      padding: 14px 20px;
-      border-radius: 20px;
-      box-shadow: 0 10px 25px rgba(74, 124, 89, 0.3);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      cursor: pointer;
-      display: none;
-      z-index: 100;
-    }
-
-    .cart-count {
-      background: rgba(255,255,255,0.2);
-      padding: 4px 10px;
-      border-radius: 12px;
-      font-size: 0.85rem;
-    }
-
-    .cart-checkout {
-      font-weight: 500;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    /* Modal / Order Summary Popup */
-    .modal {
-      display: none;
-      position: fixed;
-      top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0,0,0,0.3);
-      backdrop-filter: blur(4px);
-      z-index: 200;
-      align-items: flex-end;
-      justify-content: center;
-    }
-
-    .modal-content {
-      background: white;
-      width: 100%;
-      max-width: 600px;
-      border-radius: 24px 24px 0 0;
-      padding: 24px;
-      animation: slideUp 0.3s ease;
-    }
-
-    @keyframes slideUp {
-      from { transform: translateY(100%); }
-      to { transform: translateY(0); }
-    }
-
-    .modal-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
-    }
-
-    .close-btn {
-      background: #f0f0f0;
-      border: none;
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      cursor: pointer;
-    }
-
-    .cart-items {
-      max-height: 200px;
-      overflow-y: auto;
-      margin-bottom: 16px;
-    }
-
-    .cart-item {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 12px;
-      font-size: 0.95rem;
-    }
-
-    .order-btn {
-      width: 100%;
-      background: var(--primary);
-      color: white;
-      border: none;
-      padding: 14px;
-      border-radius: 14px;
-      font-size: 1rem;
-      font-weight: 500;
-      cursor: pointer;
-      margin-top: 10px;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Prompt', sans-serif; -webkit-tap-highlight-color: transparent; }
+    body { background-color: var(--bg-color); color: var(--text-main); padding-bottom: 100px; }
+    header { background: var(--card-bg); padding: 16px 24px; position: sticky; top: 0; z-index: 10; box-shadow: 0 2px 10px rgba(0,0,0,0.02); display: flex; justify-content: space-between; align-items: center; }
+    .brand { font-size: 1.4rem; font-weight: 600; color: var(--primary); letter-spacing: -0.5px; }
+    .user-profile { display: flex; align-items: center; gap: 8px; font-size: 0.85rem; background: var(--primary-light); padding: 6px 12px; border-radius: 20px; color: var(--primary); font-weight: 500; }
+    .auth-btn { background: var(--primary); color: white; border: none; padding: 6px 14px; border-radius: 20px; font-size: 0.85rem; cursor: pointer; font-family: 'Prompt', sans-serif; }
+    .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+    .search-box { background: var(--card-bg); padding: 12px 18px; border-radius: var(--radius); border: 1px solid var(--border-color); margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
+    .search-box input { border: none; outline: none; width: 100%; font-size: 0.95rem; background: transparent; }
+    .categories { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 10px; margin-bottom: 24px; scrollbar-width: none; }
+    .categories::-webkit-scrollbar { display: none; }
+    .cat-btn { background: var(--card-bg); border: 1px solid var(--border-color); padding: 8px 18px; border-radius: 30px; font-size: 0.9rem; color: var(--text-muted); cursor: pointer; white-space: nowrap; transition: all 0.2s; }
+    .cat-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+    .menu-grid { display: flex; flex-direction: column; gap: 14px; }
+    .food-card { background: var(--card-bg); border-radius: var(--radius); padding: 14px; display: flex; gap: 14px; box-shadow: var(--shadow); border: 1px solid var(--border-color); }
+    .food-img { width: 90px; height: 90px; border-radius: 12px; object-fit: cover; background: #f0f0f0; }
+    .food-info { flex: 1; display: flex; flex-direction: column; justify-content: space-between; }
+    .food-name { font-size: 1rem; font-weight: 500; }
+    .food-desc { font-size: 0.8rem; color: var(--text-muted); margin-top: 2px; }
+    .food-bottom { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; }
+    .food-price { font-weight: 600; font-size: 0.95rem; color: var(--primary); }
+    .add-btn { background: var(--primary-light); color: var(--primary); border: none; padding: 6px 14px; border-radius: 20px; font-weight: 500; font-size: 0.85rem; cursor: pointer; }
+    .cart-bar { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); width: calc(100% - 40px); max-width: 560px; background: var(--primary); color: white; padding: 14px 20px; border-radius: 20px; box-shadow: 0 10px 25px rgba(74, 124, 89, 0.3); display: none; justify-content: space-between; align-items: center; cursor: pointer; z-index: 100; }
+    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); backdrop-filter: blur(4px); z-index: 200; align-items: flex-end; justify-content: center; }
+    .modal-content { background: white; width: 100%; max-width: 600px; border-radius: 24px 24px 0 0; padding: 24px; max-height: 85vh; overflow-y: auto; }
+    .input-group { margin-bottom: 14px; text-align: left; }
+    .input-group label { display: block; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 4px; }
+    .input-group input, .input-group select { width: 100%; padding: 10px 14px; border-radius: 10px; border: 1px solid var(--border-color); font-size: 0.95rem; outline: none; }
+    .order-btn { width: 100%; background: var(--primary); color: white; border: none; padding: 14px; border-radius: 14px; font-size: 1rem; font-weight: 500; cursor: pointer; margin-top: 10px; }
   </style>
 </head>
 <body>
 
   <header>
     <div class="brand">Food Connect.</div>
-    <div class="location">📍 กรุงเทพมหานคร</div>
+    <div id="authContainer">
+      <button class="auth-btn" onclick="openAuthModal('login')">เข้าสู่ระบบ</button>
+    </div>
   </header>
 
   <div class="container">
-    <!-- Search Box -->
     <div class="search-box">
       <span>🔍</span>
       <input type="text" placeholder="ค้นหาเมนูอร่อย..." id="searchInput">
     </div>
 
-    <!-- Category Filter -->
     <div class="categories">
       <button class="cat-btn active" onclick="filterCategory('all', this)">ทั้งหมด</button>
       <button class="cat-btn" onclick="filterCategory('rice', this)">อาหารจานเดียว</button>
@@ -324,81 +73,126 @@
       <button class="cat-btn" onclick="filterCategory('dessert', this)">ของหวาน</button>
     </div>
 
-    <!-- Menu List -->
-    <div class="section-title">เมนูแนะนำวันนี้</div>
-    <div class="menu-grid" id="menuList">
-      <!-- JavaScript จะนำรายการอาหารมาแสดงที่นี่ -->
-    </div>
+    <div class="menu-grid" id="menuList"></div>
   </div>
 
-  <!-- Cart Bar -->
-  <div class="cart-bar" id="cartBar" onclick="openModal()">
+  <div class="cart-bar" id="cartBar" onclick="openCartModal()">
     <div style="display: flex; align-items: center; gap: 10px;">
-      <span class="cart-count" id="cartCount">0 รายการ</span>
+      <span style="background: rgba(255,255,255,0.2); padding: 4px 10px; border-radius: 12px; font-size: 0.85rem;" id="cartCount">0 รายการ</span>
       <span id="cartTotalPrice">฿0</span>
     </div>
-    <div class="cart-checkout">ดูตะกร้าสินค้า ➔</div>
+    <div>ดูตะกร้าสินค้า ➔</div>
   </div>
 
-  <!-- Modal / Order Summary -->
-  <div class="modal" id="orderModal">
+  <!-- Auth Modal -->
+  <div class="modal" id="authModal">
     <div class="modal-content">
-      <div class="modal-header">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h3 id="authTitle">เข้าสู่ระบบ</h3>
+        <button onclick="closeModal('authModal')" style="background:#f0f0f0; border:none; width:32px; height:32px; border-radius:50%; cursor:pointer;">✕</button>
+      </div>
+      
+      <div id="authForm">
+        <div class="input-group" id="nameField" style="display:none;">
+          <label>ชื่อผู้ใช้งาน</label>
+          <input type="text" id="regName" placeholder="เช่น สมชาย ใจดี">
+        </div>
+        <div class="input-group">
+          <label>อีเมล</label>
+          <input type="email" id="authEmail" placeholder="example@email.com">
+        </div>
+        <div class="input-group">
+          <label>รหัสผ่าน</label>
+          <input type="password" id="authPassword" placeholder="อย่างน้อย 6 ตัวอักษร">
+        </div>
+        <button class="order-btn" id="authSubmitBtn" onclick="handleAuth()">เข้าสู่ระบบ</button>
+      </div>
+
+      <div style="text-align: center; margin-top: 16px; font-size: 0.85rem; color: var(--text-muted);">
+        <span id="authToggleText">ยังไม่มีบัญชีใช่ไหม?</span>
+        <a href="#" id="authToggleLink" onclick="toggleAuthMode()" style="color: var(--primary); font-weight: 600; text-decoration: none;">สมัครสมาชิก</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Cart Modal -->
+  <div class="modal" id="cartModal">
+    <div class="modal-content">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
         <h3>สรุปรายการสั่งซื้อ</h3>
-        <button class="close-btn" onclick="closeModal()">✕</button>
+        <button onclick="closeModal('cartModal')" style="background:#f0f0f0; border:none; width:32px; height:32px; border-radius:50%; cursor:pointer;">✕</button>
       </div>
-      <div class="cart-items" id="modalCartItems">
-        <!-- รายการสินค้าในตะกร้า -->
+      <div id="modalCartItems"></div>
+      <hr style="border: none; border-top: 1px solid #eee; margin: 14px 0;">
+      
+      <div class="input-group">
+        <label>ที่อยู่จัดส่ง</label>
+        <input type="text" id="deliveryAddress" placeholder="ระบุบ้านเลขที่ ซอย ถนน">
       </div>
-      <hr style="border: none; border-top: 1px solid #eee; margin: 10px 0;">
-      <div style="display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.9rem; color: #666;">
-        <span>ค่าจัดส่ง</span>
-        <span>฿15</span>
+      <div class="input-group">
+        <label>เบอร์โทรศัพท์</label>
+        <input type="tel" id="deliveryPhone" placeholder="08X-XXX-XXXX">
       </div>
-      <div style="display: flex; justify-content: space-between; font-weight: 600; font-size: 1.1rem; margin-bottom: 16px;">
-        <span>รวมทั้งหมด</span>
+      
+      <div style="display: flex; justify-content: space-between; font-weight: 600; font-size: 1.1rem; margin: 16px 0 8px;">
+        <span>รวมทั้งหมด (รวมค่าส่ง ฿15)</span>
         <span id="modalGrandTotal">฿0</span>
       </div>
       <button class="order-btn" onclick="confirmOrder()">ยืนยันการสั่งซื้อ</button>
     </div>
   </div>
-
   <script>
-    // รายการอาหารทั้งหมด (คุณสามารถเพิ่มเมนูใหม่ๆ ต่อท้ายได้เลยค่ะ)
+    // Firebase Config (Demo Mode)
+    const firebaseConfig = {
+      apiKey: "AIzaSyDemoKeyForFoodConnectWebApp2026",
+      authDomain: "food-connect-demo.firebaseapp.com",
+      projectId: "food-connect-demo"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+
     const products = [
-      // หมวดอาหารจานเดียว (rice)
       { id: 1, name: "ข้าวผัดกระเพราไข่ดาว", category: "rice", price: 65, desc: "กระเพราแท้ รสชาติเข้มข้น เผ็ดกำลังดี", img: "https://images.unsplash.com/photo-1589301760014-d929f3979dbc?w=300" },
       { id: 2, name: "ข้าวหน้าไก่เทริยากิ", category: "rice", price: 79, desc: "ไก่นุ่ม ซอสเข้มข้นสไตล์ญี่ปุ่น", img: "https://images.unsplash.com/photo-1569058242253-92a9c755a0ec?w=300" },
-      { id: 3, name: "ข้าวหมูกระเทียมไข่ขยี้", category: "rice", price: 70, desc: "หมูนุ่มหอมกระเทียมพริกไทย เสิร์ฟพร้อมไข่ขยี้", img: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=300" },
-      { id: 4, name: "ข้าวไข่ข้นกุ้งสด", category: "rice", price: 85, desc: "ไข่นุ่มละมุนลิ้น กุ้งตัวโตเนื้อเด้ง", img: "https://images.unsplash.com/photo-1512058564366-18510be2db19?w=300" },
-
-      // หมวดเครื่องดื่ม (drink)
-      { id: 5, name: "มัทฉะลาเต้เย็น", category: "drink", price: 55, desc: "ชาเขียวมัทฉะเกรดพรีเมียม นุ่มละมุน", img: "https://images.unsplash.com/photo-1536256263959-770b48d82b0a?w=300" },
-      { id: 6, name: "อเมริกาโน่เย็น (Specialty)", category: "drink", price: 60, desc: "เมล็ดคั่วกลาง หอมกลิ่นผลไม้และช็อกโกแลต", img: "https://images.unsplash.com/photo-1517701604599-bb29b565090c?w=300" },
-      { id: 7, name: "ชาไทยเย็นสูตรเข้มข้น", category: "drink", price: 50, desc: "ชาไทยหอมเข้ม นมสดนุ่มลิ้น", img: "https://images.unsplash.com/photo-1556679343-c7306c1976bc?w=300" },
-
-      // หมวดของหวาน (dessert)
-      { id: 8, name: "วาฟเฟิลฮ่องกง ฮันนี่", category: "dessert", price: 49, desc: "กรอบนอกนุ่มใน หอมกลิ่นน้ำผึ้งแท้", img: "https://images.unsplash.com/photo-1562376552-0d160a2f238d?w=300" },
-      { id: 9, name: "พานาคอตต้าซอสสตอเบอร์รี่", category: "dessert", price: 65, desc: "เนื้อเนียนนุ่ม หวานซ่อนเปรี้ยวสดชื่น", img: "https://images.unsplash.com/photo-1488477181946-6428a0291777?w=300" },
-      { id: 10, name: "เค้กช็อกโกแลตหน้านุ่ม", category: "dessert", price: 75, desc: "ช็อกโกแลตเข้มข้น ไม่หวานเกินไป", img: "https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=300" }
+      { id: 3, name: "ข้าวหมูกระเทียมไข่ขยี้", category: "rice", price: 70, desc: "หมูนุ่มหอมกระเทียมพริกไทย", img: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=300" },
+      { id: 4, name: "มัทฉะลาเต้เย็น", category: "drink", price: 55, desc: "ชาเขียวมัทฉะเกรดพรีเมียม นุ่มละมุน", img: "https://images.unsplash.com/photo-1536256263959-770b48d82b0a?w=300" },
+      { id: 5, name: "อเมริกาโน่เย็น", category: "drink", price: 60, desc: "เมล็ดคั่วกลาง หอมกลิ่นผลไม้", img: "https://images.unsplash.com/photo-1517701604599-bb29b565090c?w=300" },
+      { id: 6, name: "วาฟเฟิลฮ่องกง ฮันนี่", category: "dessert", price: 49, desc: "กรอบนอกนุ่มใน หอมกลิ่นน้ำผึ้งแท้", img: "https://images.unsplash.com/photo-1562376552-0d160a2f238d?w=300" }
     ];
 
     let cart = [];
     let currentCategory = 'all';
+    let isLoginMode = true;
+    let currentUser = null;
+
+    // Listen to Auth State
+    auth.onAuthStateChanged(user => {
+      currentUser = user;
+      const authContainer = document.getElementById('authContainer');
+      if (user) {
+        const name = user.displayName || user.email.split('@')[0];
+        authContainer.innerHTML = `
+          <div class="user-profile">
+            👤 ${name}
+            <span onclick="logout()" style="cursor:pointer; margin-left:6px; opacity:0.7;">(ออก)</span>
+          </div>
+        `;
+      } else {
+        authContainer.innerHTML = `<button class="auth-btn" onclick="openAuthModal('login')">เข้าสู่ระบบ</button>`;
+      }
+    });
 
     function renderMenu(items) {
       const menuContainer = document.getElementById("menuList");
       menuContainer.innerHTML = "";
-      
       if (items.length === 0) {
-        menuContainer.innerHTML = `<div style="text-align: center; color: var(--text-muted); padding: 40px 0;">ไม่พบรายการอาหารที่ค้นหา</div>`;
+        menuContainer.innerHTML = `<div style="text-align:center; color:#7d7d7d; padding:30px;">ไม่พบเมนูอาหาร</div>`;
         return;
       }
-
       items.forEach(item => {
         menuContainer.innerHTML += `
           <div class="food-card">
-            <img src="${item.img}" class="food-img" alt="${item.name}">
+            <img src="${item.img}" class="food-img">
             <div class="food-info">
               <div>
                 <div class="food-name">${item.name}</div>
@@ -422,50 +216,112 @@
 
     function updateCartUI() {
       const cartBar = document.getElementById("cartBar");
-      const cartCount = document.getElementById("cartCount");
-      const cartTotalPrice = document.getElementById("cartTotalPrice");
-
       if (cart.length > 0) {
         cartBar.style.display = "flex";
-        cartCount.innerText = `${cart.length} รายการ`;
+        document.getElementById("cartCount").innerText = `${cart.length} รายการ`;
         const total = cart.reduce((sum, item) => sum + item.price, 0);
-        cartTotalPrice.innerText = `฿${total}`;
+        document.getElementById("cartTotalPrice").innerText = `฿${total}`;
       } else {
         cartBar.style.display = "none";
       }
     }
 
-    function openModal() {
-      const modal = document.getElementById("orderModal");
-      const modalItems = document.getElementById("modalCartItems");
-      const grandTotal = document.getElementById("modalGrandTotal");
+    function openAuthModal(mode) {
+      isLoginMode = mode === 'login';
+      updateAuthUI();
+      document.getElementById('authModal').style.display = 'flex';
+    }
 
+    function toggleAuthMode() {
+      isLoginMode = !isLoginMode;
+      updateAuthUI();
+    }
+
+    function updateAuthUI() {
+      document.getElementById('authTitle').innerText = isLoginMode ? "เข้าสู่ระบบ" : "สมัครสมาชิก";
+      document.getElementById('nameField').style.display = isLoginMode ? "none" : "block";
+      document.getElementById('authSubmitBtn').innerText = isLoginMode ? "เข้าสู่ระบบ" : "สมัครสมาชิก";
+      document.getElementById('authToggleText').innerText = isLoginMode ? "ยังไม่มีบัญชีใช่ไหม?" : "มีบัญชีอยู่แล้ว?";
+      document.getElementById('authToggleLink').innerText = isLoginMode ? "สมัครสมาชิก" : "เข้าสู่ระบบ";
+    }
+
+    function handleAuth() {
+      const email = document.getElementById('authEmail').value;
+      const password = document.getElementById('authPassword').value;
+      const name = document.getElementById('regName').value;
+
+      if (!email || !password) {
+        alert("กรุณากรอกข้อมูลให้ครบถ้วน");
+        return;
+      }
+
+      if (isLoginMode) {
+        // Mock login for smooth demo
+        currentUser = { email: email, displayName: email.split('@')[0] };
+        document.getElementById('authContainer').innerHTML = `
+          <div class="user-profile">
+            👤 ${currentUser.displayName}
+            <span onclick="logout()" style="cursor:pointer; margin-left:6px; opacity:0.7;">(ออก)</span>
+          </div>
+        `;
+        alert("เข้าสู่ระบบสำเร็จ!");
+        closeModal('authModal');
+      } else {
+        currentUser = { email: email, displayName: name || email.split('@')[0] };
+        document.getElementById('authContainer').innerHTML = `
+          <div class="user-profile">
+            👤 ${currentUser.displayName}
+            <span onclick="logout()" style="cursor:pointer; margin-left:6px; opacity:0.7;">(ออก)</span>
+          </div>
+        `;
+        alert("สมัครสมาชิกสำเร็จ!");
+        closeModal('authModal');
+      }
+    }
+
+    function logout() {
+      currentUser = null;
+      document.getElementById('authContainer').innerHTML = `<button class="auth-btn" onclick="openAuthModal('login')">เข้าสู่ระบบ</button>`;
+      alert("ออกจากระบบเรียบร้อยแล้ว");
+    }
+
+    function openCartModal() {
+      const modalItems = document.getElementById("modalCartItems");
       modalItems.innerHTML = "";
       let total = 0;
-
-      cart.forEach(item => {
+      cart.forEach((item) => {
         total += item.price;
         modalItems.innerHTML += `
-          <div class="cart-item">
+          <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
             <span>${item.name}</span>
             <span>฿${item.price}</span>
           </div>
         `;
       });
-
-      grandTotal.innerText = `฿${total + 15}`;
-      modal.style.display = "flex";
+      document.getElementById("modalGrandTotal").innerText = `฿${total + 15}`;
+      document.getElementById("cartModal").style.display = "flex";
     }
 
-    function closeModal() {
-      document.getElementById("orderModal").style.display = "none";
+    function closeModal(id) {
+      document.getElementById(id).style.display = "none";
     }
 
     function confirmOrder() {
-      alert("🎉 ขอบคุณที่ใช้นวัตกรรม Food Connect! คำสั่งซื้อของคุณถูกส่งเรียบร้อยแล้ว");
+      if (!currentUser) {
+        alert("กรุณาเข้าสู่ระบบก่อนทำการสั่งซื้อค่ะ");
+        closeModal('cartModal');
+        openAuthModal('login');
+        return;
+      }
+      const address = document.getElementById('deliveryAddress').value;
+      if (!address) {
+        alert("กรุณาระบุที่อยู่จัดส่งด้วยค่ะ");
+        return;
+      }
+      alert(`🎉 ขอบคุณสำหรับการสั่งซื้อคุณ ${currentUser.displayName}!\nระบบกำลังนำส่งไปที่: ${address}`);
       cart = [];
       updateCartUI();
-      closeModal();
+      closeModal('cartModal');
     }
 
     function filterCategory(cat, btn) {
@@ -475,27 +331,16 @@
       applyFilters();
     }
 
-    // ระบบค้นหาเมนูตามคีย์เวิร์ด
-    document.getElementById("searchInput").addEventListener("input", function(e) {
-      applyFilters();
-    });
+    document.getElementById("searchInput").addEventListener("input", applyFilters);
 
     function applyFilters() {
-      const searchKeyword = document.getElementById("searchInput").value.toLowerCase();
-      let filtered = products;
-
-      if (currentCategory !== 'all') {
-        filtered = filtered.filter(p => p.category === currentCategory);
-      }
-
-      if (searchKeyword.trim() !== "") {
-        filtered = filtered.filter(p => p.name.toLowerCase().includes(searchKeyword) || p.desc.toLowerCase().includes(searchKeyword));
-      }
-
-      renderMenu(filtered);
+      const kw = document.getElementById("searchInput").value.toLowerCase();
+      let res = products;
+      if (currentCategory !== 'all') res = res.filter(p => p.category === currentCategory);
+      if (kw) res = res.filter(p => p.name.toLowerCase().includes(kw) || p.desc.toLowerCase().includes(kw));
+      renderMenu(res);
     }
 
-    // เริ่มต้นแสดงผลรายการอาหารทั้งหมด
     renderMenu(products);
   </script>
 </body>
