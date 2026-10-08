@@ -383,19 +383,62 @@
     let currentCategory = 'all';
     let currentUser = null;
 
-    // ข้อมูลร้านค้าที่สมัครเข้ามา
+    // ข้อมูลร้านค้าและรายการอาหารในระบบ
     let merchantApplications = [
       {
         id: 101,
-        storeName: "ร้านกะเพราตาแป๊ะ (ตัวอย่าง)",
+        storeName: "ร้านกะเพราตาแป๊ะ",
         ownerName: "สมชาย ใจดี",
-        phone: "0812345678",
+        phone: "081-234-5678",
         bank: "กสิกรไทย (KBANK)",
         bankAccount: "123-4-56789-0",
         bankName: "สมชาย ใจดี",
-        status: "approved", // approved, pending, rejected
+        status: "approved",
         items: [
-          { id: 1, name: "ข้าวผัดกระเพราไข่ดาว", category: "rice", price: 65, desc: "กระเพราแท้ รสชาติเข้มข้น เผ็ดกำลังดี", img: "https://images.unsplash.com/photo-1589301760014-d929f3979dbc?w=300" }
+          { id: 1, name: "ข้าวผัดกะเพราหมูกรอบ", category: "rice", price: 65, desc: "หมูกรอบแท้ หนังกรอบ ชุ่มฉ่ำ รสจัดจ้าน", img: "https://images.unsplash.com/photo-1589301760014-d929f3979dbc?w=300" },
+          { id: 2, name: "ข้าวผัดกระเพราไก่ไข่ดาว", category: "rice", price: 55, desc: "เนื้อไก่นุ่ม ผัดหอมกลิ่นกระทะ", img: "https://images.unsplash.com/photo-1603133872878-684f208fb84b?w=300" }
+        ]
+      },
+      {
+        id: 102,
+        storeName: "Cha-Thai Cafe (ชาไทย คาเฟ่)",
+        ownerName: "วิภาดา สุขเสริฐ",
+        phone: "089-876-5432",
+        bank: "ไทยพาณิชย์ (SCB)",
+        bankAccount: "987-6-54321-0",
+        bankName: "วิภาดา สุขเสริฐ",
+        status: "approved",
+        items: [
+          { id: 3, name: "ชาไทยเย็นสูตรเข้มข้น", category: "drink", price: 45, desc: "ใบชาแท้หอมเข้มข้น หวานมันกำลังดี", img: "https://images.unsplash.com/photo-1551024709-8f23befc6f87?w=300" },
+          { id: 4, name: "มัจฉะลาเต้เย็น", category: "drink", price: 60, desc: "ผงมัจฉะแท้นำเข้า ชงสดแก้วต่อแก้ว", img: "https://images.unsplash.com/photo-1536256263959-770b48d82b0a?w=300" }
+        ]
+      },
+      {
+        id: 103,
+        storeName: "ร้านขนมหวานแม่พยอม",
+        ownerName: "พยอม มีสุข",
+        phone: "086-555-1234",
+        bank: "กรุงเทพ (BBL)",
+        bankAccount: "456-7-89012-3",
+        bankName: "พยอม มีสุข",
+        status: "approved",
+        items: [
+          { id: 5, name: "ข้าวเหนียวมะม่วงอกร้อง", category: "dessert", price: 80, desc: "มะม่วงอกร้องหวานหอม ข้าวเหนียวมูนกะทิสด", img: "https://images.unsplash.com/photo-1563805042-7684c019e1cb?w=300" },
+          { id: 6, name: "บัวลอยไข่หวานกะทะร้อน", category: "dessert", price: 40, desc: "แป้งนุ่มหนึบ กะทิหอมอบควันเทียน", img: "https://images.unsplash.com/photo-1509440159596-0249088772ff?w=300" }
+        ]
+      },
+      {
+        id: 104,
+        storeName: "ส้มตำแซ่บเวอร์ อิสานแท้",
+        ownerName: "ณรงค์เดช ศรีอีสาน",
+        phone: "092-111-2233",
+        bank: "กรุงไทย (KTB)",
+        bankAccount: "777-1-23456-8",
+        bankName: "ณรงค์เดช ศรีอีสาน",
+        status: "pending",
+        items: [
+          { id: 7, name: "ส้มตำปูปลาร้าแซ่บๆ", category: "rice", price: 50, desc: "ปลาร้าต้มสุกหอมๆ พริกสดเผ็ดซี๊ด", img: "https://images.unsplash.com/photo-1540420773420-3366772f4999?w=300" },
+          { id: 8, name: "ไก่ย่างวิเชียรบุรี (ครึ่งตัว)", category: "rice", price: 120, desc: "หมักเครื่องเทศเข้าเนื้อ ย่างแห้งกำลังดี", img: "https://images.unsplash.com/photo-1598515214211-89d3c73ae83b?w=300" }
         ]
       }
     ];
@@ -461,7 +504,6 @@
       container.appendChild(div);
     }
 
-    // ดึงเฉพาะเมนูจากร้านที่ได้รับการ "อนุมัติ" แล้วมาแสดงในหน้าสั่งอาหาร
     function getAllApprovedProducts() {
       let products = [];
       merchantApplications.filter(m => m.status === 'approved').forEach(m => {
@@ -536,7 +578,6 @@
       document.getElementById('merchantForm').style.display = role === 'merchant' ? 'block' : 'none';
     }
 
-    // สมัครร้านค้าพร้อมอัปโหลดรูป
     async function submitMerchantForm() {
       const storeName = document.getElementById('mStoreName').value.trim();
       const ownerName = document.getElementById('mOwnerName').value.trim();
@@ -599,7 +640,6 @@
       merchantApplications.push(newMerchant);
       updateAdminView();
 
-      // แจ้งเตือนเข้า Telegram
       const msg = `🏪 *มีร้านค้าใหม่สมัครเข้าใช้งาน!*\n━━━━━━━━━━━━━━━━━━\n🏪 *ชื่อร้าน:* ${storeName}\n👤 *เจ้าของ:* ${ownerName}\n📞 *เบอร์โทร:* ${phone}\n🍲 *จำนวนเมนู:* ${items.length} เมนู\n\n⚠️ *กรุณาเข้าดูในระบบแอดมินเพื่อตรวจสอบและกดอนุมัติ*`;
       sendTelegramMessage(msg);
 
@@ -607,7 +647,6 @@
       closeModal('partnerModal');
     }
 
-    // อัปเดตหน้าแอดมิน
     function updateAdminView() {
       const container = document.getElementById('adminStoreList');
       const pendingCountEl = document.getElementById('pendingCount');
@@ -756,7 +795,6 @@
 
     document.getElementById("searchInput").addEventListener("input", renderApprovedMenu);
 
-    // เริ่มต้นแสดงผลระบบ
     updateAdminView();
     renderApprovedMenu();
   </script>
