@@ -1,17 +1,15 @@
-const { sendTelegramNotification } = require('./telegram');
+const express = require('express');
+const app = express();
+const { sendTelegramNotification } = require('./telegramService');
 
-// ตัวอย่าง: เมื่อมีออเดอร์เข้ามา
+app.use(express.json()); // รองรับการรับข้อมูลแบบ JSON จากหน้าเว็บ
+
+// API รับออเดอร์จากหน้าร้าน
 app.post('/api/orders', async (req, res) => {
-  const { customerName, foodName, price } = req.body;
+  try {
+    const { customerName, foodName, price } = req.body;
 
-  // ข้อความแจ้งเตือน (ขึ้นบรรทัดใหม่ได้ตรงๆ ใน Backtick)
-  const message = `🍕 <b>มีออเดอร์ใหม่เข้ามา!</b>
-👤 <b>ลูกค้า:</b> ${customerName}
-🍲 <b>รายการ:</b> ${foodName}
-💰 <b>ราคา:</b> ${price} บาท`;
+    // 1. (ตัวอย่าง) บันทึกลง Database ของร้านค้าที่นี่...
 
-  // ส่งเข้า Telegram
-  await sendTelegramNotification(message);
-
-  res.json({ success: true, message: 'บันทึกออเดอร์สำเร็จ' });
-});
+    // 2. สร้างข้อความแจ้งเตือน
+    const message = `🍕 <b>มีออเดอร์ใหม่เข้ามา!</b>
