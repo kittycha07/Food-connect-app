@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Food Delivery & Registration System</title>
+  <title>Express Food Delivery System</title>
   <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
@@ -29,30 +29,34 @@
     .user-profile-badge { font-size: 0.85rem; color: var(--text-muted); background: #f0f0f0; padding: 6px 12px; border-radius: 20px; }
 
     .role-switcher { display: flex; background: #eaeded; padding: 4px; border-radius: 12px; margin: 15px auto; max-width: 600px; width: 90%; }
-    .role-btn { flex: 1; padding: 10px; border: none; background: transparent; font-weight: 600; border-radius: 8px; cursor: pointer; transition: 0.2s; color: var(--text-muted); font-size: 0.9rem; }
+    .role-btn { flex: 1; padding: 10px; border: none; background: transparent; font-weight: 600; border-radius: 8px; cursor: pointer; transition: 0.2s; color: var(--text-muted); font-size: 0.85rem; }
     .role-btn.active { background: #fff; color: var(--primary-dark); box-shadow: 0 2px 6px rgba(0,0,0,0.08); }
 
     .container { max-width: 600px; margin: 0 auto; padding: 0 15px; }
 
     .card { background: var(--card-bg); border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow); border: 1px solid var(--border); margin-bottom: 20px; }
     .card-title { font-size: 1.1rem; font-weight: 600; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
+    .section-subtitle { font-size: 0.9rem; font-weight: 600; color: var(--primary-dark); margin: 15px 0 8px 0; border-bottom: 2px solid var(--primary-light); padding-bottom: 4px; }
 
     /* Form Inputs */
     .form-group { margin-bottom: 12px; text-align: left; }
     .form-group label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 4px; color: var(--text-main); }
     .form-control { width: 100%; padding: 10px 14px; border: 1px solid var(--border); border-radius: 8px; font-size: 0.9rem; outline: none; }
     .form-control:focus { border-color: var(--primary); }
+    .form-row { display: flex; gap: 10px; }
+    .form-row .form-group { flex: 1; }
 
     /* Map Mockup */
-    .map-box { width: 100%; height: 200px; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 15px; overflow: hidden; position: relative; background: #e5e9ec; }
+    .map-box { width: 100%; height: 220px; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 12px; overflow: hidden; position: relative; background: #e5e9ec; }
     .map-box iframe { width: 100%; height: 100%; border: 0; }
 
     /* Buttons */
-    .btn { width: 100%; padding: 12px; border-radius: 12px; border: none; font-weight: 600; font-size: 0.95rem; cursor: pointer; transition: 0.2s; }
+    .btn { width: 100%; padding: 12px; border-radius: 12px; border: none; font-weight: 600; font-size: 0.95rem; cursor: pointer; transition: 0.2s; text-align: center; display: inline-block; text-decoration: none; }
     .btn-primary { background: var(--primary); color: white; }
     .btn-primary:hover { background: var(--primary-dark); }
     .btn-warning { background: var(--warning); color: white; }
     .btn-danger { background: var(--danger); color: white; }
+    .btn-nav { background: #2980b9; color: white; margin-bottom: 10px; display: flex; justify-content: center; align-items: center; gap: 8px; }
 
     /* Status Badges */
     .status-badge { display: inline-block; padding: 4px 10px; border-radius: 12px; font-size: 0.8rem; font-weight: 600; }
@@ -79,7 +83,7 @@
     <div class="user-profile-badge" id="headerUserInfo">ยังไม่ได้เข้าสู่ระบบ</div>
   </header>
 
-  <!-- Role Switching Navigation -->
+  <!-- Role Switcher -->
   <div class="role-switcher">
     <button class="role-btn active" id="btnRoleCustomer" onclick="switchRole('customer')">🛒 1. ฝั่งลูกค้า</button>
     <button class="role-btn" id="btnRoleMerchant" onclick="switchRole('merchant')">🏪 2. ฝั่งร้านค้า</button>
@@ -90,10 +94,9 @@
 
     <!-- ==================== 1. CUSTOMER SECTION ==================== -->
     <div id="customerSection">
-      <!-- Auth Form (Customer) -->
       <div class="card" id="customerAuthCard">
-        <div class="card-title">📝 สมัครสมาชิก / เข้าสู่ระบบ (ลูกค้า)</div>
-        <form onsubmit="registerUser(event, 'customer')">
+        <div class="card-title">📝 เข้าสู่ระบบลูกค้า</div>
+        <form onsubmit="registerCustomer(event)">
           <div class="form-group">
             <label>ชื่อ-นามสกุล</label>
             <input type="text" class="form-control" id="custName" placeholder="เช่น สมชาย ใจดี" required>
@@ -110,19 +113,18 @@
         </form>
       </div>
 
-      <!-- App Content (Customer) -->
       <div class="card" id="customerAppCard" style="display:none;">
         <div class="card-title">
-          <span>🛒 สั่งอาหาร (ร้านกะเพราตาแป๊ะ)</span>
+          <span id="custStoreTitle">🛒 สั่งอาหาร</span>
           <span class="status-badge status-completed">เปิดให้บริการ</span>
         </div>
         
         <div style="display:flex; gap:12px; align-items:center; margin-bottom:15px; background:#f9f9f9; padding:10px; border-radius:12px;">
-          <img src="https://images.unsplash.com/photo-1589301760014-d929f3979dbc?w=150" style="width:70px; height:70px; object-fit:cover; border-radius:8px;">
+          <img id="custFoodImg" src="https://images.unsplash.com/photo-1589301760014-d929f3979dbc?w=150" style="width:80px; height:80px; object-fit:cover; border-radius:8px;">
           <div style="flex:1;">
-            <div style="font-weight:600;">ข้าวผัดกะเพราหมูกรอบ + ไข่ดาว</div>
+            <div style="font-weight:600;" id="custFoodName">ข้าวผัดกะเพราหมูกรอบ + ไข่ดาว</div>
             <div style="color:var(--text-muted); font-size:0.85rem;">เผ็ดมาก / กะเพราล้วน</div>
-            <div style="font-weight:700; color:var(--primary); margin-top:4px;">฿75.00</div>
+            <div style="font-weight:700; color:var(--primary); margin-top:4px;" id="custFoodPrice">฿75.00</div>
           </div>
         </div>
 
@@ -130,10 +132,9 @@
           <iframe id="customerMap" src="https://maps.google.com/maps?q=13.7563,100.5018&z=15&output=embed"></iframe>
         </div>
 
-        <button class="btn btn-primary" id="btnPlaceOrder" onclick="placeOrder()">🛒 ชำระเงิน & ส่งออเดอร์ (฿75 + ค่าส่ง ฿20)</button>
+        <button class="btn btn-primary" id="btnPlaceOrder" onclick="placeOrder()">🛒 ชำระเงิน & ส่งออเดอร์</button>
       </div>
 
-      <!-- Customer Order Status Tracking -->
       <div class="card" id="customerTracker" style="display:none;">
         <div class="card-title">
           <span>📡 สถานะออเดอร์ของคุณ</span>
@@ -148,27 +149,70 @@
 
     <!-- ==================== 2. MERCHANT SECTION ==================== -->
     <div id="merchantSection" style="display:none;">
-      <!-- Auth Form (Merchant) -->
       <div class="card" id="merchantAuthCard">
-        <div class="card-title">🏪 ลงทะเบียนร้านค้าพาร์ทเนอร์</div>
-        <form onsubmit="registerUser(event, 'merchant')">
+        <div class="card-title">🏪 ลงทะเบียนพาร์ทเนอร์ร้านค้า</div>
+        <form onsubmit="registerMerchant(event)">
+          <div class="section-subtitle">👤 ข้อมูลเจ้าของร้าน & การยืนยันตัวตน</div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>ชื่อ-นามสกุล เจ้าของร้าน</label>
+              <input type="text" class="form-control" id="merchOwnerName" placeholder="เช่น นายสมศักดิ์ ค้าดี" required>
+            </div>
+            <div class="form-group">
+              <label>เบอร์โทรศัพท์</label>
+              <input type="tel" class="form-control" id="merchPhone" placeholder="08X-XXX-XXXX" required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>เลขบัตรประชาชน (ยืนยันตัวตน)</label>
+            <input type="text" class="form-control" id="merchNationalID" placeholder="1XXXXXXXXXXXX" maxlength="13" required>
+          </div>
+
+          <div class="section-subtitle">🏦 บัญชีธนาคารสำหรับรับเงิน</div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>ธนาคาร</label>
+              <select class="form-control" id="merchBank" required>
+                <option value="">-- เลือกธนาคาร --</option>
+                <option value="กสิกรไทย">กสิกรไทย (KBANK)</option>
+                <option value="ไทยพาณิชย์">ไทยพาณิชย์ (SCB)</option>
+                <option value="กรุงเทพ">กรุงเทพ (BBL)</option>
+                <option value="กรุงไทย">กรุงไทย (KTB)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>เลขที่บัญชี</label>
+              <input type="text" class="form-control" id="merchBankAccount" placeholder="XXX-X-XXXXX-X" required>
+            </div>
+          </div>
+
+          <div class="section-subtitle">🍱 ข้อมูลร้านค้า & เมนูเด็ด</div>
           <div class="form-group">
             <label>ชื่อร้านค้า</label>
-            <input type="text" class="form-control" id="merchName" placeholder="เช่น ร้านกะเพราตาแป๊ะ" required>
+            <input type="text" class="form-control" id="merchStoreName" placeholder="เช่น ร้านกะเพราตาแป๊ะ" required>
           </div>
+
           <div class="form-group">
-            <label>เบอร์โทรศัพท์ร้านค้า</label>
-            <input type="tel" class="form-control" id="merchPhone" placeholder="02-XXX-XXXX" required>
+            <label>ชื่อเมนูอาหารแนะนำ</label>
+            <input type="text" class="form-control" id="merchMenuName" value="ข้าวผัดกะเพราหมูกรอบ + ไข่ดาว" required>
           </div>
-          <div class="form-group">
-            <label>หมวดหมู่อาหาร</label>
-            <input type="text" class="form-control" placeholder="อาหารตามสั่ง / อาหารไทย" value="อาหารตามสั่ง" required>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>ราคาขาย (บาท)</label>
+              <input type="number" class="form-control" id="merchMenuPrice" value="75" required>
+            </div>
+            <div class="form-group">
+              <label>URL รูปภาพอาหาร</label>
+              <input type="url" class="form-control" id="merchMenuImg" value="https://images.unsplash.com/photo-1589301760014-d929f3979dbc?w=300" required>
+            </div>
           </div>
-          <button type="submit" class="btn btn-primary">ลงทะเบียนเปิดร้านค้า</button>
+
+          <button type="submit" class="btn btn-primary" style="margin-top:10px;">ลงทะเบียนเปิดร้านค้า</button>
         </form>
       </div>
 
-      <!-- App Content (Merchant) -->
       <div class="card" id="merchantAppCard" style="display:none;">
         <div class="card-title">
           <span id="merchantTitleDisplay">🏪 รายการออเดอร์เข้า</span>
@@ -181,27 +225,71 @@
 
     <!-- ==================== 3. RIDER SECTION ==================== -->
     <div id="riderSection" style="display:none;">
-      <!-- Auth Form (Rider) -->
       <div class="card" id="riderAuthCard">
-        <div class="card-title">🛵 สมัครขับไรเดอร์ส่งอาหาร</div>
-        <form onsubmit="registerUser(event, 'rider')">
-          <div class="form-group">
-            <label>ชื่อ-นามสกุล ไรเดอร์</label>
-            <input type="text" class="form-control" id="riderName" placeholder="เช่น สมศักดิ์ วิ่งไว" required>
+        <div class="card-title">🛵 ลงทะเบียนสมัครขับไรเดอร์</div>
+        <form onsubmit="registerRider(event)">
+          <div class="section-subtitle">👤 ข้อมูลส่วนตัว (ต้องอายุไม่ต่ำกว่า 18 ปี)</div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>ชื่อ-นามสกุล ไรเดอร์</label>
+              <input type="text" class="form-control" id="riderName" placeholder="สมศักดิ์ วิ่งไว" required>
+            </div>
+            <div class="form-group">
+              <label>อายุ (ปี)</label>
+              <input type="number" class="form-control" id="riderAge" min="18" placeholder="18 ขึ้นไป" required>
+            </div>
           </div>
-          <div class="form-group">
-            <label>เบอร์โทรศัพท์</label>
-            <input type="tel" class="form-control" id="riderPhone" placeholder="08X-XXX-XXXX" required>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>เบอร์โทรศัพท์</label>
+              <input type="tel" class="form-control" id="riderPhone" placeholder="08X-XXX-XXXX" required>
+            </div>
+            <div class="form-group">
+              <label>เลขบัตรประชาชน</label>
+              <input type="text" class="form-control" id="riderNationalID" placeholder="1XXXXXXXXXXXX" maxlength="13" required>
+            </div>
           </div>
-          <div class="form-group">
-            <label>ทะเบียนรถจักรยานยนต์</label>
-            <input type="text" class="form-control" id="riderPlate" placeholder="1กข-9999 กทม." required>
+
+          <div class="section-subtitle">🏦 บัญชีธนาคารรับเงินค่ารอบ</div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>ธนาคาร</label>
+              <select class="form-control" id="riderBank" required>
+                <option value="">-- เลือกธนาคาร --</option>
+                <option value="กสิกรไทย">กสิกรไทย (KBANK)</option>
+                <option value="ไทยพาณิชย์">ไทยพาณิชย์ (SCB)</option>
+                <option value="กรุงเทพ">กรุงเทพ (BBL)</option>
+                <option value="กรุงไทย">กรุงไทย (KTB)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>เลขที่บัญชี</label>
+              <input type="text" class="form-control" id="riderBankAccount" placeholder="XXX-X-XXXXX-X" required>
+            </div>
           </div>
-          <button type="submit" class="btn btn-primary">ลงทะเบียนเริ่มรับงาน</button>
+
+          <div class="section-subtitle">🏍️ ข้อมูลยานพาหนะ & เอกสารรถ</div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>ป้ายทะเบียนรถ</label>
+              <input type="text" class="form-control" id="riderPlate" placeholder="1กข-9999 กทม." required>
+            </div>
+            <div class="form-group">
+              <label>เลข พ.ร.บ. คุ้มครอง</label>
+              <input type="text" class="form-control" id="riderPRB" placeholder="PRB-12345678" required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>ระบุเล่มทะเบียน / เอกสารรับรองรถ</label>
+            <input type="text" class="form-control" id="riderDocInfo" placeholder="เช่น เล่มทะเบียนสีรายการ / เอกสารโอนสิทธิ์" required>
+          </div>
+
+          <button type="submit" class="btn btn-primary" style="margin-top:10px;">สมัครเป็นไรเดอร์</button>
         </form>
       </div>
 
-      <!-- App Content (Rider) -->
       <div class="card" id="riderAppCard" style="display:none;">
         <div class="card-title">
           <span>🛵 สถานะการทำงานของไรเดอร์</span>
@@ -244,66 +332,93 @@
   </div>
 
   <script>
-    // ================= USER & ORDER STATE =================
-    const users = {
-      customer: null,
-      merchant: null,
-      rider: null
-    };
-
+    // State Management
+    const users = { customer: null, merchant: null, rider: null };
     let currentOrder = null;
     let riderWallet = 0;
 
     const storeLocation = { lat: 13.7563, lng: 100.5018 };
     const customerLocation = { lat: 13.7512, lng: 100.4925 };
-    const riderLocation = { lat: 13.7580, lng: 100.5050 };
 
-    // ================= REGISTER / LOGIN SYSTEM =================
-    function registerUser(event, role) {
-      event.preventDefault();
+    // Registration Functions
+    function registerCustomer(e) {
+      e.preventDefault();
+      users.customer = {
+        name: document.getElementById('custName').value,
+        phone: document.getElementById('custPhone').value,
+        address: document.getElementById('custAddress').value
+      };
+      document.getElementById('customerAuthCard').style.display = 'none';
+      document.getElementById('customerAppCard').style.display = 'block';
+      updateHeaderProfile('customer');
+      alert('✅ เข้าสู่ระบบลูกค้าสำเร็จ!');
+    }
 
-      if (role === 'customer') {
-        users.customer = {
-          name: document.getElementById('custName').value,
-          phone: document.getElementById('custPhone').value,
-          address: document.getElementById('custAddress').value
-        };
-        document.getElementById('customerAuthCard').style.display = 'none';
-        document.getElementById('customerAppCard').style.display = 'block';
-      } else if (role === 'merchant') {
-        users.merchant = {
-          name: document.getElementById('merchName').value,
-          phone: document.getElementById('merchPhone').value
-        };
-        document.getElementById('merchantAuthCard').style.display = 'none';
-        document.getElementById('merchantAppCard').style.display = 'block';
-        document.getElementById('merchantTitleDisplay').innerText = `🏪 รายการออเดอร์เข้า (${users.merchant.name})`;
-      } else if (role === 'rider') {
-        users.rider = {
-          name: document.getElementById('riderName').value,
-          phone: document.getElementById('riderPhone').value,
-          plate: document.getElementById('riderPlate').value
-        };
-        document.getElementById('riderAuthCard').style.display = 'none';
-        document.getElementById('riderAppCard').style.display = 'block';
+    function registerMerchant(e) {
+      e.preventDefault();
+      users.merchant = {
+        ownerName: document.getElementById('merchOwnerName').value,
+        phone: document.getElementById('merchPhone').value,
+        nationalID: document.getElementById('merchNationalID').value,
+        bank: document.getElementById('merchBank').value,
+        bankAccount: document.getElementById('merchBankAccount').value,
+        storeName: document.getElementById('merchStoreName').value,
+        menuName: document.getElementById('merchMenuName').value,
+        price: parseFloat(document.getElementById('merchMenuPrice').value),
+        img: document.getElementById('merchMenuImg').value
+      };
+
+      document.getElementById('merchantAuthCard').style.display = 'none';
+      document.getElementById('merchantAppCard').style.display = 'block';
+      document.getElementById('merchantTitleDisplay').innerText = `🏪 รายการออเดอร์เข้า (${users.merchant.storeName})`;
+      
+      // Update Customer UI menu according to merchant setting
+      document.getElementById('custStoreTitle').innerText = `🛒 สั่งอาหาร (${users.merchant.storeName})`;
+      document.getElementById('custFoodName').innerText = users.merchant.menuName;
+      document.getElementById('custFoodPrice').innerText = `฿${users.merchant.price.toFixed(2)}`;
+      document.getElementById('custFoodImg').src = users.merchant.img;
+
+      updateHeaderProfile('merchant');
+      alert('✅ ลงทะเบียนพาร์ทเนอร์ร้านค้าเรียบร้อยแล้ว!');
+    }
+
+    function registerRider(e) {
+      e.preventDefault();
+      const age = parseInt(document.getElementById('riderAge').value);
+      if (age < 18) {
+        alert('❌ ไรเดอร์ต้องมีอายุไม่ต่ำกว่า 18 ปีบริบูรณ์ครับ');
+        return;
       }
 
-      updateHeaderProfile(role);
-      alert('✅ ลงทะเบียนเข้าสู่ระบบสำเร็จ!');
+      users.rider = {
+        name: document.getElementById('riderName').value,
+        age: age,
+        phone: document.getElementById('riderPhone').value,
+        nationalID: document.getElementById('riderNationalID').value,
+        bank: document.getElementById('riderBank').value,
+        bankAccount: document.getElementById('riderBankAccount').value,
+        plate: document.getElementById('riderPlate').value,
+        prb: document.getElementById('riderPRB').value,
+        docInfo: document.getElementById('riderDocInfo').value
+      };
+
+      document.getElementById('riderAuthCard').style.display = 'none';
+      document.getElementById('riderAppCard').style.display = 'block';
+      updateHeaderProfile('rider');
+      alert('✅ ลงทะเบียนสมัครขับไรเดอร์เรียบร้อยแล้ว!');
     }
 
     function updateHeaderProfile(role) {
       const header = document.getElementById('headerUserInfo');
       if (users[role]) {
         if (role === 'customer') header.innerText = `👤 ลูกค้า: ${users.customer.name}`;
-        if (role === 'merchant') header.innerText = `🏪 ร้าน: ${users.merchant.name}`;
+        if (role === 'merchant') header.innerText = `🏪 ร้าน: ${users.merchant.storeName}`;
         if (role === 'rider') header.innerText = `🛵 ไรเดอร์: ${users.rider.name} (${users.rider.plate})`;
       } else {
         header.innerText = `ยังไม่ได้เข้าสู่ระบบ (${role})`;
       }
     }
 
-    // ================= NAVIGATION =================
     function switchRole(role) {
       document.querySelectorAll('.role-btn').forEach(b => b.classList.remove('active'));
       document.getElementById('customerSection').style.display = 'none';
@@ -330,33 +445,36 @@
       consoleEl.scrollTop = consoleEl.scrollHeight;
     }
 
-    // ================= 1. CUSTOMER ACTIONS =================
+    // Customer Actions
     function placeOrder() {
       if (!users.customer) {
-        alert('กรุณาลงทะเบียนฝั่งลูกค้าก่อนสั่งซื้อครับ');
+        alert('กรุณาลงทะเบียนเข้าสู่ระบบฝั่งลูกค้าก่อนสั่งซื้อครับ');
         return;
       }
 
+      const itemPrice = users.merchant ? users.merchant.price : 75;
+      const itemName = users.merchant ? users.merchant.menuName : "ข้าวผัดกะเพราหมูกรอบ + ไข่ดาว";
+      const storeName = users.merchant ? users.merchant.storeName : "ร้านกะเพราตาแป๊ะ";
+
       currentOrder = {
         id: "ORD-" + Math.floor(1000 + Math.random() * 9000),
-        item: "ข้าวผัดกะเพราหมูกรอบ + ไข่ดาว",
-        price: 75,
+        item: itemName,
+        price: itemPrice,
         deliveryFee: 20,
         riderFee: 45,
         status: "PENDING_MERCHANT",
         customerName: users.customer.name,
         customerAddress: users.customer.address,
-        storeName: users.merchant ? users.merchant.name : "ร้านกะเพราตาแป๊ะ"
+        storeName: storeName
       };
 
       document.getElementById('btnPlaceOrder').disabled = true;
       document.getElementById('customerTracker').style.display = 'block';
-      
       updateCustomerUI('รอร้านรับออเดอร์', 'ส่งรายการอาหารไปที่ร้านค้าเรียบร้อยแล้ว...', 'status-pending');
-      logAI(`ออเดอร์สร้างสำเร็จ: ${currentOrder.id} โดยผู้ใช้ ${users.customer.name}`);
+      logAI(`ออเดอร์สร้างสำเร็จ: ${currentOrder.id} โดย ${users.customer.name}`);
 
       renderMerchantView();
-      alert('🎉 ชำระเงินเรียบร้อยแล้ว! สลับไปที่ "2. ฝั่งร้านค้า" เพื่อรับออเดอร์ได้เลยครับ');
+      alert('🎉 ชำระเงินเรียบร้อยแล้ว! สลับไปที่ "2. ฝั่งร้านค้า" เพื่อรับออเดอร์');
     }
 
     function updateCustomerUI(badgeText, descText, badgeClass) {
@@ -366,7 +484,7 @@
       document.getElementById('customerStatusText').innerText = descText;
     }
 
-    // ================= 2. MERCHANT ACTIONS =================
+    // Merchant Actions
     function renderMerchantView() {
       const container = document.getElementById('merchantOrdersContainer');
       if (!currentOrder || currentOrder.status === 'COMPLETED') {
@@ -397,24 +515,20 @@
     function merchantAcceptOrder() {
       currentOrder.status = "PREPARING";
       renderMerchantView();
-      updateCustomerUI('ร้านกำลังทำอาหาร', 'ร้านค้ากำลังปรุงอาหารให้คุณอย่างพิถีพิถัน...', 'status-pending');
-      logAI("ร้านค้ารับออเดอร์แล้ว -> กำลังเริ่มอัลกอริทึม AI ค้นหาไรเดอร์");
+      updateCustomerUI('ร้านกำลังทำอาหาร', 'ร้านค้ากำลังปรุงอาหารให้คุณ...', 'status-pending');
+      logAI("ร้านค้ารับออเดอร์แล้ว -> เริ่มค้นหาไรเดอร์ใกล้อย่างรวดเร็ว");
 
-      setTimeout(() => {
-        runAIDispatcher();
-      }, 1500);
+      setTimeout(() => { runAIDispatcher(); }, 1500);
     }
 
-    // ================= 3. AI DISPATCHING ALGORITHM =================
+    // AI Dispatcher
     function runAIDispatcher() {
       currentOrder.status = "SEARCHING_RIDER";
-      updateCustomerUI('กำลังค้นหาไรเดอร์', 'AI กำลังวิเคราะห์และจับคู่ไรเดอร์ที่ใกล้ที่สุด...', 'status-matching');
-
-      logAI(`[AI Match] กำลังค้นหาไรเดอร์ที่สแตนด์บายใกล้ร้าน...`);
+      updateCustomerUI('กำลังค้นหาไรเดอร์', 'AI กำลังจับคู่ไรเดอร์ที่อยู่ใกล้ที่สุด...', 'status-matching');
+      logAI(`[AI Match] ค้นหาไรเดอร์ในรัศมีใกล้เคียง...`);
 
       setTimeout(() => {
-        logAI(`[AI Broadcast] พบไรเดอร์ -> ยิงการแจ้งเตือนงานไปที่แอปไรเดอร์`);
-        
+        logAI(`[AI Broadcast] พบไรเดอร์ -> ส่งงานไปที่แอปไรเดอร์`);
         document.getElementById('incPrice').innerText = `฿${currentOrder.riderFee}.00`;
         document.getElementById('modalStoreName').innerText = currentOrder.storeName;
         document.getElementById('modalCustName').innerText = currentOrder.customerName;
@@ -424,13 +538,11 @@
       }, 1500);
     }
 
-    // ================= 4. RIDER ACTIONS =================
+    // Rider Actions
     function rejectJob() {
       document.getElementById('riderModal').style.display = 'none';
-      logAI(`[AI Dispatch] ไรเดอร์ปฏิเสธงาน -> กำลังส่งให้ไรเดอร์คนถัดไป...`);
-      setTimeout(() => {
-        runAIDispatcher();
-      }, 1500);
+      logAI(`[AI Dispatch] ไรเดอร์ปฏิเสธงาน -> ค้นหาไรเดอร์ถัดไป...`);
+      setTimeout(() => { runAIDispatcher(); }, 1500);
     }
 
     function acceptJob() {
@@ -444,8 +556,8 @@
       document.getElementById('riderModal').style.display = 'none';
       currentOrder.status = "RIDER_ACCEPTED";
 
-      updateCustomerUI('ไรเดอร์กำลังมารับอาหาร', `ไรเดอร์ (${users.rider.name}) รับงานแล้ว กำลังไปรับอาหาร...`, 'status-matching');
-      logAI(`ไรเดอร์ ${users.rider.name} (${users.rider.plate}) กดรับงานแล้ว!`);
+      updateCustomerUI('ไรเดอร์กำลังมารับอาหาร', `ไรเดอร์ (${users.rider.name}) รับงานแล้ว...`, 'status-matching');
+      logAI(`ไรเดอร์ ${users.rider.name} (${users.rider.plate}) รับงานสำเร็จ!`);
 
       switchRole('rider');
       renderRiderActiveJob();
@@ -456,6 +568,9 @@
       if (!currentOrder) return;
 
       if (currentOrder.status === 'RIDER_ACCEPTED') {
+        // Navigation Map URL to Store
+        const storeMapNav = `https://www.google.com/maps/dir/?api=1&destination=${storeLocation.lat},${storeLocation.lng}`;
+        
         container.innerHTML = `
           <div style="background:#fff; border:2px solid var(--primary); padding:15px; border-radius:12px;">
             <div style="font-weight:700; color:var(--primary); margin-bottom:8px;">📍 ขั้นที่ 1: เดินทางไปรับอาหารที่ร้าน</div>
@@ -463,6 +578,9 @@
               <b>ร้าน:</b> ${currentOrder.storeName}<br>
               <b>เมนู:</b> ${currentOrder.item}
             </div>
+            
+            <a href="${storeMapNav}" target="_blank" class="btn btn-nav">🗺️ เปิดเส้นทางนำทางไปร้านค้า (Google Maps)</a>
+
             <div class="map-box">
               <iframe src="https://maps.google.com/maps?q=${storeLocation.lat},${storeLocation.lng}&z=16&output=embed"></iframe>
             </div>
@@ -470,6 +588,9 @@
           </div>
         `;
       } else if (currentOrder.status === 'PICKED_UP') {
+        // Navigation Map URL to Customer
+        const custMapNav = `https://www.google.com/maps/dir/?api=1&destination=${customerLocation.lat},${customerLocation.lng}`;
+
         container.innerHTML = `
           <div style="background:#fff; border:2px solid var(--warning); padding:15px; border-radius:12px;">
             <div style="font-weight:700; color:var(--warning); margin-bottom:8px;">🚚 ขั้นที่ 2: นำอาหารไปส่งให้ลูกค้า</div>
@@ -477,6 +598,9 @@
               <b>ลูกค้า:</b> ${currentOrder.customerName}<br>
               <b>จุดส่ง:</b> ${currentOrder.customerAddress}
             </div>
+
+            <a href="${custMapNav}" target="_blank" class="btn btn-nav">🗺️ เปิดเส้นทางนำทางไปหาลูกค้า (Google Maps)</a>
+
             <div class="map-box">
               <iframe src="https://maps.google.com/maps?q=${customerLocation.lat},${customerLocation.lng}&z=16&output=embed"></iframe>
             </div>
@@ -490,14 +614,13 @@
 
     function riderPickUpFood() {
       currentOrder.status = "PICKED_UP";
-      updateCustomerUI('กำลังนำอาหารไปส่ง', 'ไรเดอร์รับอาหารแล้ว กำลังมุ่งหน้าไปส่งตามที่อยู่ของคุณ...', 'status-delivering');
-      logAI(`ไรเดอร์รับอาหารจากร้านเรียบร้อย -> กำลังเดินทางไปหา ${currentOrder.customerName}`);
+      updateCustomerUI('กำลังนำอาหารไปส่ง', 'ไรเดอร์กำลังเดินทางไปส่งอาหารตามที่อยู่ของคุณ...', 'status-delivering');
+      logAI(`ไรเดอร์รับอาหารแล้ว -> กำลังมุ่งหน้าไปหา ${currentOrder.customerName}`);
       renderRiderActiveJob();
     }
 
     function riderCompleteOrder() {
       currentOrder.status = "COMPLETED";
-
       riderWallet += currentOrder.riderFee;
       document.getElementById('riderWalletMain').innerText = `฿${riderWallet}.00`;
 
