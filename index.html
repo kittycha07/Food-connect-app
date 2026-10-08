@@ -16,6 +16,7 @@
       --border-color: #eeeeee;
       --radius: 16px;
       --shadow: 0 4px 20px rgba(0,0,0,0.04);
+      --danger: #e74c3c;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Prompt', sans-serif; -webkit-tap-highlight-color: transparent; }
     body { background-color: var(--bg-color); color: var(--text-main); padding-bottom: 100px; }
@@ -27,6 +28,15 @@
     .auth-btn { background: var(--primary); color: white; border: none; padding: 6px 14px; border-radius: 20px; font-size: 0.85rem; cursor: pointer; }
     .container { max-width: 600px; margin: 0 auto; padding: 20px; }
     
+    /* Store Status Switch Bar */
+    .store-status-bar { background: #fff; padding: 12px 18px; border-radius: var(--radius); border: 1px solid var(--border-color); margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; }
+    .switch { position: relative; display: inline-block; width: 48px; height: 26px; }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 34px; }
+    .slider:before { position: absolute; content: ""; height: 20px; width: 20px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
+    input:checked + .slider { background-color: var(--primary); }
+    input:checked + .slider:before { transform: translateX(22px); }
+
     /* Service Nav */
     .services-nav { display: flex; gap: 10px; margin-bottom: 20px; background: #fff; padding: 6px; border-radius: 20px; border: 1px solid var(--border-color); }
     .service-tab { flex: 1; padding: 10px; text-align: center; border-radius: 14px; border: none; background: transparent; font-size: 0.9rem; font-weight: 500; color: var(--text-muted); cursor: pointer; transition: all 0.2s; }
@@ -50,6 +60,7 @@
     .food-bottom { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; }
     .food-price { font-weight: 600; font-size: 0.95rem; color: var(--primary); }
     .add-btn { background: var(--primary-light); color: var(--primary); border: none; padding: 6px 14px; border-radius: 20px; font-weight: 500; font-size: 0.85rem; cursor: pointer; }
+    .add-btn:disabled { background: #f0f0f0; color: #aaa; cursor: not-allowed; }
     
     /* Map Container */
     .map-box { width: 100%; height: 200px; border-radius: 16px; border: 1px solid var(--border-color); margin-bottom: 14px; overflow: hidden; position: relative; }
@@ -62,13 +73,18 @@
     /* Modal Styles */
     .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); backdrop-filter: blur(4px); z-index: 200; align-items: flex-end; justify-content: center; }
     .modal-content { background: white; width: 100%; max-width: 600px; border-radius: 24px 24px 0 0; padding: 24px; max-height: 85vh; overflow-y: auto; text-align: left; }
-    .input-group { margin-bottom: 14px; }
-    .input-group label { display: block; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 4px; }
-    .input-group input, .input-group select { width: 100%; padding: 10px 14px; border-radius: 10px; border: 1px solid var(--border-color); font-size: 0.95rem; outline: none; }
+    .form-section-title { font-weight: 600; font-size: 0.95rem; color: var(--primary); margin: 16px 0 10px; border-bottom: 1px solid var(--primary-light); padding-bottom: 4px; }
+    .input-group { margin-bottom: 12px; }
+    .input-group label { display: block; font-size: 0.82rem; color: var(--text-muted); margin-bottom: 4px; }
+    .input-group input, .input-group select { width: 100%; padding: 10px 14px; border-radius: 10px; border: 1px solid var(--border-color); font-size: 0.9rem; outline: none; }
     .order-btn { width: 100%; background: var(--primary); color: white; border: none; padding: 14px; border-radius: 14px; font-size: 1rem; font-weight: 500; cursor: pointer; margin-top: 10px; }
     
-    .qr-container { text-align: center; margin: 16px 0; padding: 16px; background: #f9f9f9; border-radius: 16px; }
-    .qr-img { width: 180px; height: 180px; margin: 0 auto; border-radius: 12px; border: 1px solid #eee; display: block; }
+    .role-tabs { display: flex; gap: 8px; margin-bottom: 16px; }
+    .role-btn { flex: 1; padding: 8px; border: 1px solid var(--border-color); border-radius: 10px; background: #fff; font-size: 0.85rem; font-weight: 500; cursor: pointer; }
+    .role-btn.active { background: var(--primary-light); color: var(--primary); border-color: var(--primary); }
+    
+    .qr-container { text-align: center; margin: 12px 0; padding: 12px; background: #f9f9f9; border-radius: 16px; }
+    .qr-img { width: 160px; height: 160px; margin: 0 auto; border-radius: 12px; border: 1px solid #eee; display: block; }
   </style>
 </head>
 <body>
@@ -84,6 +100,19 @@
   </header>
 
   <div class="container">
+    
+    <!-- Store Open/Close Toggle -->
+    <div class="store-status-bar">
+      <div>
+        <div style="font-weight: 600; font-size: 0.9rem;" id="storeStatusText">🟢 ร้านค้าเปิดให้บริการ</div>
+        <div style="font-size: 0.75rem; color: var(--text-muted);">ลูกค้าสามารถสั่งอาหารได้ตามปกติ</div>
+      </div>
+      <label class="switch">
+        <input type="checkbox" id="storeToggle" checked onclick="toggleStoreStatus(this)">
+        <span class="slider"></span>
+      </label>
+    </div>
+
     <!-- Service Navigation Tabs -->
     <div class="services-nav">
       <button class="service-tab active" onclick="switchService('food', this)">🍔 สั่งอาหาร</button>
@@ -112,7 +141,6 @@
     <div id="rideSection" style="display:none;">
       <div style="background:#fff; padding:20px; border-radius:var(--radius); border:1px solid var(--border-color);">
         <h3 style="margin-bottom:14px;">เรียกเดินทาง (Connect Ride)</h3>
-        
         <div class="map-box">
           <iframe id="rideMap" src="https://maps.google.com/maps?q=13.7563,100.5018&z=14&output=embed"></iframe>
         </div>
@@ -134,7 +162,6 @@
     <div id="parcelSection" style="display:none;">
       <div style="background:#fff; padding:20px; border-radius:var(--radius); border:1px solid var(--border-color);">
         <h3 style="margin-bottom:14px;">ส่งพัสดุด่วน (Connect Parcel)</h3>
-        
         <div class="map-box">
           <iframe id="parcelMap" src="https://maps.google.com/maps?q=13.7563,100.5018&z=14&output=embed"></iframe>
         </div>
@@ -170,37 +197,130 @@
     <div>ดูตะกร้าสินค้า ➔</div>
   </div>
 
-  <!-- Partner Application Modal (Telegram Connected) -->
+  <!-- Partner Application Modal -->
   <div class="modal" id="partnerModal">
     <div class="modal-content">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-        <h3>สมัครเป็นพาร์ทเนอร์ / ไรเดอร์</h3>
+        <h3>ลงทะเบียนพาร์ทเนอร์</h3>
         <button onclick="closeModal('partnerModal')" style="background:#f0f0f0; border:none; width:32px; height:32px; border-radius:50%; cursor:pointer;">✕</button>
       </div>
-      <p style="font-size: 0.85rem; color: var(--text-muted);">สแกน QR Code หรือกรอกข้อมูลเพื่อส่งเข้ากลุ่ม Telegram ได้ทันที</p>
-      
-      <div class="qr-container">
-        <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://food-connect-rider-register.com" class="qr-img" alt="Rider Register QR">
-        <div style="margin-top:8px; font-size:0.8rem; color:var(--primary); font-weight:500;">สแกนเพื่อสมัครพาร์ทเนอร์ Food Connect</div>
+
+      <div class="role-tabs">
+        <button class="role-btn active" id="tabRiderBtn" onclick="switchPartnerRole('rider')">🛵 สมัครเป็นไรเดอร์</button>
+        <button class="role-btn" id="tabMerchantBtn" onclick="switchPartnerRole('merchant')">🏪 สมัครร้านค้าพาร์ทเนอร์</button>
       </div>
 
-      <div class="input-group">
-        <label>ชื่อ-นามสกุล</label>
-        <input type="text" id="partnerName" placeholder="ระบุชื่อจริง-นามสกุล">
+      <div class="qr-container">
+        <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://food-connect-register.com" class="qr-img" alt="Register QR">
+        <div style="margin-top:6px; font-size:0.78rem; color:var(--primary); font-weight:500;">สแกนเพื่อเข้าสู่หน้าสมัครพาร์ทเนอร์</div>
       </div>
-      <div class="input-group">
-        <label>เบอร์โทรศัพท์</label>
-        <input type="tel" id="partnerPhone" placeholder="08X-XXX-XXXX">
+
+      <!-- Rider Registration Form -->
+      <div id="riderForm">
+        <div class="form-section-title">👤 ข้อมูลส่วนตัว (ต้องอายุ 18 ปีขึ้นไป)</div>
+        <div class="input-group">
+          <label>ชื่อ-นามสกุล ผู้สมัคร *</label>
+          <input type="text" id="riderName" placeholder="ระบุชื่อจริง-นามสกุล">
+        </div>
+        <div class="input-group">
+          <label>วัน/เดือน/ปีเกิด (เพื่อยืนยันอายุ 18+) *</label>
+          <input type="date" id="riderDOB">
+        </div>
+        <div class="input-group">
+          <label>เลขบัตรประชาชน 13 หลัก *</label>
+          <input type="text" id="riderIDCard" maxlength="13" placeholder="X-XXXX-XXXXX-XX-X">
+        </div>
+        <div class="input-group">
+          <label>เบอร์โทรศัพท์มือถือ *</label>
+          <input type="tel" id="riderPhone" placeholder="08X-XXX-XXXX">
+        </div>
+
+        <div class="form-section-title">🛵 ข้อมูลยานพาหนะ & ใบอนุญาต</div>
+        <div class="input-group">
+          <label>ยี่ห้อ / รุ่นรถ *</label>
+          <input type="text" id="riderVehicleModel" placeholder="เช่น Honda Wave 110i">
+        </div>
+        <div class="input-group">
+          <label>สีของตัวรถ *</label>
+          <input type="text" id="riderVehicleColor" placeholder="เช่น สีดำ-แดง">
+        </div>
+        <div class="input-group">
+          <label>ป้ายทะเบียนรถ *</label>
+          <input type="text" id="riderLicensePlate" placeholder="เช่น 1กข 9999 กทม">
+        </div>
+        <div class="input-group">
+          <label>เลขที่ พ.ร.บ. คุ้มครองผู้ประสบภัยจากรถ *</label>
+          <input type="text" id="riderPorRorBor" placeholder="ระบุหมายเลข พ.ร.บ.">
+        </div>
+        <div class="input-group">
+          <label>เลขที่ใบขับขี่ *</label>
+          <input type="text" id="riderDriverLicense" placeholder="ระบุหมายเลขใบขับขี่">
+        </div>
+
+        <div class="form-section-title">🏦 บัญชีธนาคารสำหรับรับเงิน</div>
+        <div class="input-group">
+          <label>ธนาคาร *</label>
+          <select id="riderBank">
+            <option value="กสิกรไทย (KBANK)">กสิกรไทย (KBANK)</option>
+            <option value="ไทยพาณิชย์ (SCB)">ไทยพาณิชย์ (SCB)</option>
+            <option value="กรุงเทพ (BBL)">กรุงเทพ (BBL)</option>
+            <option value="กรุงไทย (KTB)">กรุงไทย (KTB)</option>
+            <option value="กรุงศรี (BAY)">กรุงศรี (BAY)</option>
+            <option value="ออมสิน (GSB)">ออมสิน (GSB)</option>
+          </select>
+        </div>
+        <div class="input-group">
+          <label>เลขที่บัญชีธนาคาร *</label>
+          <input type="text" id="riderBankAccount" placeholder="ระบุเลขที่บัญชี">
+        </div>
+        <div class="input-group">
+          <label>ชื่อบัญชีธนาคาร *</label>
+          <input type="text" id="riderBankName" placeholder="ต้องตรงกับชื่อผู้สมัคร">
+        </div>
+
+        <button class="order-btn" onclick="submitRiderForm()">ส่งใบสมัครไรเดอร์</button>
       </div>
-      <div class="input-group">
-        <label>ประเภทพาร์ทเนอร์</label>
-        <select id="partnerType">
-          <option value="ไรเดอร์ รถจักรยานยนต์">ไรเดอร์ (รถจักรยานยนต์)</option>
-          <option value="ไรเดอร์ รถยนต์">ไรเดอร์ (รถยนต์ส่วนบุคคล)</option>
-          <option value="ร้านค้าพาร์ทเนอร์">ร้านค้าพาร์ทเนอร์ (Food Connect)</option>
-        </select>
+
+      <!-- Merchant Registration Form -->
+      <div id="merchantForm" style="display:none;">
+        <div class="form-section-title">🏪 ข้อมูลร้านค้าพาร์ทเนอร์</div>
+        <div class="input-group">
+          <label>ชื่อร้านค้า *</label>
+          <input type="text" id="merchantStoreName" placeholder="เช่น ร้านกะเพราตาแป๊ะ">
+        </div>
+        <div class="input-group">
+          <label>ชื่อ-นามสกุล เจ้าของร้าน *</label>
+          <input type="text" id="merchantOwnerName" placeholder="ระบุชื่อจริงเจ้าของร้าน">
+        </div>
+        <div class="input-group">
+          <label>เบอร์โทรศัพท์ติดต่อร้านค้า *</label>
+          <input type="tel" id="merchantPhone" placeholder="08X-XXX-XXXX">
+        </div>
+
+        <div class="form-section-title">🏦 บัญชีธนาคารรับเงินรายได้ร้านค้า</div>
+        <div class="input-group">
+          <label>ธนาคาร *</label>
+          <select id="merchantBank">
+            <option value="กสิกรไทย (KBANK)">กสิกรไทย (KBANK)</option>
+            <option value="ไทยพาณิชย์ (SCB)">ไทยพาณิชย์ (SCB)</option>
+            <option value="กรุงเทพ (BBL)">กรุงเทพ (BBL)</option>
+            <option value="กรุงไทย (KTB)">กรุงไทย (KTB)</option>
+            <option value="กรุงศรี (BAY)">กรุงศรี (BAY)</option>
+            <option value="ออมสิน (GSB)">ออมสิน (GSB)</option>
+          </select>
+        </div>
+        <div class="input-group">
+          <label>เลขที่บัญชีธนาคาร *</label>
+          <input type="text" id="merchantBankAccount" placeholder="ระบุเลขที่บัญชี">
+        </div>
+        <div class="input-group">
+          <label>ชื่อบัญชีธนาคาร *</label>
+          <input type="text" id="merchantBankName" placeholder="ระบุชื่อบัญชี">
+        </div>
+
+        <button class="order-btn" onclick="submitMerchantForm()">ส่งใบสมัครร้านค้า</button>
       </div>
-      <button class="order-btn" onclick="submitPartnerToTelegram()">ส่งใบสมัครเข้า Telegram</button>
+
     </div>
   </div>
 
@@ -245,9 +365,11 @@
   </div>
 
   <script>
-    // ⚙️ ค่า Token และ Chat ID ของคุณใส่ให้เรียบร้อยแล้ว
+    // ⚙️ Telegram Configuration
     const TELEGRAM_BOT_TOKEN = "8711164646:AAFpEpZEfeg4uxCxXNgYNSMqRAbfBi8L67k";
     const TELEGRAM_CHAT_ID = "-1004393601800";
+
+    let isStoreOpen = true;
 
     const products = [
       { id: 1, name: "ข้าวผัดกระเพราไข่ดาว", category: "rice", price: 65, desc: "กระเพราแท้ รสชาติเข้มข้น เผ็ดกำลังดี", img: "https://images.unsplash.com/photo-1589301760014-d929f3979dbc?w=300" },
@@ -262,6 +384,19 @@
     let cart = [];
     let currentCategory = 'all';
     let currentUser = null;
+
+    function toggleStoreStatus(checkbox) {
+      isStoreOpen = checkbox.checked;
+      const statusText = document.getElementById('storeStatusText');
+      if (isStoreOpen) {
+        statusText.innerText = "🟢 ร้านค้าเปิดให้บริการ";
+        statusText.style.color = "#2b2b2b";
+      } else {
+        statusText.innerText = "🔴 ร้านปิดให้บริการ";
+        statusText.style.color = "var(--danger)";
+      }
+      renderMenu(products);
+    }
 
     function renderMenu(items) {
       const menuContainer = document.getElementById("menuList");
@@ -281,7 +416,7 @@
               </div>
               <div class="food-bottom">
                 <div class="food-price">฿${item.price}</div>
-                <button class="add-btn" onclick="addToCart(${item.id})">+ เพิ่ม</button>
+                <button class="add-btn" ${!isStoreOpen ? 'disabled' : ''} onclick="addToCart(${item.id})">${isStoreOpen ? '+ เพิ่ม' : 'ร้านปิด'}</button>
               </div>
             </div>
           </div>
@@ -290,6 +425,7 @@
     }
 
     function addToCart(id) {
+      if(!isStoreOpen) return alert("ขออภัย ขณะนี้ร้านปิดให้บริการ");
       const item = products.find(p => p.id === id);
       cart.push(item);
       updateCartUI();
@@ -304,6 +440,95 @@
         document.getElementById("cartTotalPrice").innerText = `฿${total}`;
       } else {
         cartBar.style.display = "none";
+      }
+    }
+
+    function switchPartnerRole(role) {
+      document.getElementById('tabRiderBtn').classList.toggle('active', role === 'rider');
+      document.getElementById('tabMerchantBtn').classList.toggle('active', role === 'merchant');
+      document.getElementById('riderForm').style.display = role === 'rider' ? 'block' : 'none';
+      document.getElementById('merchantForm').style.display = role === 'merchant' ? 'block' : 'none';
+    }
+
+    function calculateAge(birthDate) {
+      const today = new Date();
+      const dob = new Date(birthDate);
+      let age = today.getFullYear() - dob.getFullYear();
+      const m = today.getMonth() - dob.getMonth();
+      if (m < 0 || (m === 0 && today.getDate() < dob.getDate())) age--;
+      return age;
+    }
+
+    // ส่งข้อมูลไรเดอร์เข้า Telegram
+    async function submitRiderForm() {
+      const name = document.getElementById('riderName').value.trim();
+      const dob = document.getElementById('riderDOB').value;
+      const idCard = document.getElementById('riderIDCard').value.trim();
+      const phone = document.getElementById('riderPhone').value.trim();
+      const model = document.getElementById('riderVehicleModel').value.trim();
+      const color = document.getElementById('riderVehicleColor').value.trim();
+      const plate = document.getElementById('riderLicensePlate').value.trim();
+      const prb = document.getElementById('riderPorRorBor').value.trim();
+      const license = document.getElementById('riderDriverLicense').value.trim();
+      const bank = document.getElementById('riderBank').value;
+      const bankAccount = document.getElementById('riderBankAccount').value.trim();
+      const bankName = document.getElementById('riderBankName').value.trim();
+
+      if (!name || !dob || !idCard || !phone || !model || !color || !plate || !prb || !license || !bankAccount || !bankName) {
+        alert("กรุณากรอกข้อมูลการสมัครไรเดอร์ให้ครบถ้วนทุกช่องค่ะ");
+        return;
+      }
+
+      if (calculateAge(dob) < 18) {
+        alert("ขออภัยผู้สมัครต้องมีอายุ 18 ปีขึ้นไปเท่านั้นค่ะ");
+        return;
+      }
+
+      const message = `🛵 *ใบสมัครไรเดอร์ใหม่ (Food Connect)*\n━━━━━━━━━━━━━━━━━━\n👤 *ชื่อ-นามสกุล:* ${name}\n🎂 *อายุ:* ${calculateAge(dob)} ปี\n🪪 *เลขบัตรประชาชน:* ${idCard}\n📞 *เบอร์โทร:* ${phone}\n\n🏍️ *ข้อมูลรถ & เอกสาร:*\n• ยี่ห้อ/รุ่น: ${model}\n• สีรถ: ${color}\n• ทะเบียน: ${plate}\n• เลข พ.ร.บ.: ${prb}\n• ใบขับขี่: ${license}\n\n🏦 *บัญชีธนาคารรับเงิน:*\n• ธนาคาร: ${bank}\n• เลขบัญชี: ${bankAccount}\n• ชื่อบัญชี: ${bankName}\n━━━━━━━━━━━━━━━━━━`;
+
+      await sendTelegramMessage(message);
+    }
+
+    // ส่งข้อมูลร้านค้าเข้า Telegram
+    async function submitMerchantForm() {
+      const storeName = document.getElementById('merchantStoreName').value.trim();
+      const ownerName = document.getElementById('merchantOwnerName').value.trim();
+      const phone = document.getElementById('merchantPhone').value.trim();
+      const bank = document.getElementById('merchantBank').value;
+      const bankAccount = document.getElementById('merchantBankAccount').value.trim();
+      const bankName = document.getElementById('merchantBankName').value.trim();
+
+      if (!storeName || !ownerName || !phone || !bankAccount || !bankName) {
+        alert("กรุณากรอกข้อมูลร้านค้าพาร์ทเนอร์ให้ครบถ้วนทุกช่องค่ะ");
+        return;
+      }
+
+      const message = `🏪 *ใบสมัครร้านค้าพาร์ทเนอร์ใหม่ (Food Connect)*\n━━━━━━━━━━━━━━━━━━\n🏪 *ชื่อร้านค้า:* ${storeName}\n👤 *เจ้าของร้าน:* ${ownerName}\n📞 *เบอร์โทรศัพท์:* ${phone}\n\n🏦 *บัญชีธนาคารรับเงินรายได้:*\n• ธนาคาร: ${bank}\n• เลขบัญชี: ${bankAccount}\n• ชื่อบัญชี: ${bankName}\n━━━━━━━━━━━━━━━━━━`;
+
+      await sendTelegramMessage(message);
+    }
+
+    async function sendTelegramMessage(msg) {
+      try {
+        const response = await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            chat_id: TELEGRAM_CHAT_ID,
+            text: msg,
+            parse_mode: "Markdown"
+          })
+        });
+
+        const data = await response.json();
+        if (data.ok) {
+          alert("🎉 ยื่นใบสมัครเรียบร้อยแล้ว! ข้อมูลถูกส่งเข้า Telegram แอดมินแล้วค่ะ");
+          closeModal('partnerModal');
+        } else {
+          alert(`❌ เกิดข้อผิดพลาดจาก Telegram API:\n${data.description}\n\n💡 คำแนะนำ: ตรวจสอบว่าดึงบอทเข้ากลุ่ม และตั้งเป็น Admin หรือยังนะคะ`);
+        }
+      } catch (err) {
+        alert("ไม่สามารถเชื่อมต่อได้: " + err.message);
       }
     }
 
@@ -329,47 +554,6 @@
         }, () => alert("ไม่สามารถดึงตำแหน่ง GPS ได้"));
       } else {
         alert("อุปกรณ์นี้ไม่รองรับระบบ GPS");
-      }
-    }
-
-    // 🚀 ฟังก์ชันส่งข้อมูลพาร์ทเนอร์เข้า Telegram API (ฉบับแก้ไขการยิงข้อมูลให้เสถียร)
-    async function submitPartnerToTelegram() {
-      const name = document.getElementById('partnerName').value.trim();
-      const phone = document.getElementById('partnerPhone').value.trim();
-      const type = document.getElementById('partnerType').value;
-
-      if (!name || !phone) {
-        alert("กรุณากรอกชื่อและเบอร์โทรศัพท์ให้ครบถ้วนค่ะ");
-        return;
-      }
-
-      // สร้างข้อความแบบ Plain Text ป้องกัน Error จาก Markdown
-      const message = `🔔 มีผู้สมัครพาร์ทเนอร์ใหม่!\n--------------------------\n👤 ชื่อ-นามสกุล: ${name}\n📞 เบอร์โทรศัพท์: ${phone}\n🛵 ประเภท: ${type}\n⏰ เวลา: ${new Date().toLocaleString('th-TH')}`;
-
-      try {
-        const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
-        const res = await fetch(url, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            chat_id: TELEGRAM_CHAT_ID,
-            text: message
-          })
-        });
-
-        const data = await res.json();
-
-        if (data.ok) {
-          alert("🎉 ยื่นใบสมัครสำเร็จ! ข้อมูลถูกส่งเข้า Telegram เรียบร้อยแล้วค่ะ");
-          document.getElementById('partnerName').value = '';
-          document.getElementById('partnerPhone').value = '';
-          closeModal('partnerModal');
-        } else {
-          alert(`เกิดข้อผิดพลาดจาก Telegram API:\n${data.description}\n\n💡 คำแนะนำ: โปรดดึงบอทเข้าไปในกลุ่ม Telegram และตั้งบอทให้เป็น Admin ก่อนนะคะ`);
-        }
-      } catch (err) {
-        console.error("Error:", err);
-        alert("ไม่สามารถเชื่อมต่อระบบได้ กรุณาตรวจสอบการเชื่อมต่ออินเทอร์เน็ต");
       }
     }
 
@@ -399,6 +583,7 @@
     }
 
     function confirmOrder() {
+      if(!isStoreOpen) return alert("ขออภัย ร้านค้าปิดให้บริการ ไม่สามารถทำรายการได้");
       if (!currentUser) return (alert('กรุณาเข้าสู่ระบบก่อนสั่งซื้อ'), closeModal('cartModal'), openAuthModal());
       const addr = document.getElementById('deliveryAddress').value;
       if (!addr) return alert('กรุณาระบุที่อยู่จัดส่ง');
