@@ -1,24 +1,15 @@
-require('dotenv').config();
 const express = require('express');
-const restaurantRoutes = require('./restaurantRoutes');
+const { sendTelegramMessage } = require('./telegram');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
-
-// Middleware สำหรับอ่าน JSON payload
 app.use(express.json());
 
-// Routes หลัก
-app.use('/api', restaurantRoutes);
+app.post('/api/order', async (req, res) => {
+  // รับข้อมูลจากหน้าเว็บ
+  const { foodName, price } = req.body;
 
-// Route ทดสอบระบบ
-app.get('/', (req, res) => {
-  res.send('Welcome to food-connect API Backend!');
-});
+  // ส่งแจ้งเตือนเข้า Telegram
+  await sendTelegramMessage(`<b>มีรายการสั่งซื้อใหม่!</b>\nเมนู: ${foodName}\nราคา: ${price} บาท`);
 
-// เริ่มรัน Server
-app.listen(PORT, () => {
-  console.log(`=================================`);
-  console.log(`🚀 food-connect server running on port ${PORT}`);
-  console.log(`=================================`);
+  res.json({ success: true, message: 'ส่งคำสั่งซื้อเรียบร้อย' });
 });
