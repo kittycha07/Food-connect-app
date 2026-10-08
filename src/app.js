@@ -1,15 +1,17 @@
-const express = require('express');
-const { sendTelegramMessage } = require('./telegram');
+const { sendTelegramNotification } = require('./telegram');
 
-const app = express();
-app.use(express.json());
+// ตัวอย่าง: เมื่อมีออเดอร์เข้ามา
+app.post('/api/orders', async (req, res) => {
+  const { customerName, foodName, price } = req.body;
 
-app.post('/api/order', async (req, res) => {
-  // รับข้อมูลจากหน้าเว็บ
-  const { foodName, price } = req.body;
+  // ข้อความแจ้งเตือน
+  const message = `🍕 <b>มีออเดอร์ใหม่เข้ามา!</b>\n\n` +
+                  `👤 <b>ลูกค้า:</b> ${customerName}\n` +
+                  `🍲 <b>รายการ:</b> ${foodName}\n` +
+                  `💰 <b>ราคา:</b> ${price} บาท`;
 
-  // ส่งแจ้งเตือนเข้า Telegram
-  await sendTelegramMessage(`<b>มีรายการสั่งซื้อใหม่!</b>\nเมนู: ${foodName}\nราคา: ${price} บาท`);
+  // ส่งเข้า Telegram
+  await sendTelegramNotification(message);
 
-  res.json({ success: true, message: 'ส่งคำสั่งซื้อเรียบร้อย' });
+  res.json({ success: true, message: 'บันทึกออเดอร์สำเร็จ' });
 });
