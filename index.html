@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Express Food Delivery System</title>
+  <title>Food Connect System</title>
   <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
@@ -79,7 +79,7 @@
 <body>
 
   <header>
-    <div class="brand">🚀 Express Delivery</div>
+    <div class="brand">🍔 Food Connect</div>
     <div class="user-profile-badge" id="headerUserInfo">ยังไม่ได้เข้าสู่ระบบ</div>
   </header>
 
@@ -95,7 +95,7 @@
     <!-- ==================== 1. CUSTOMER SECTION ==================== -->
     <div id="customerSection">
       <div class="card" id="customerAuthCard">
-        <div class="card-title">📝 เข้าสู่ระบบลูกค้า</div>
+        <div class="card-title">📝 เข้าสู่ระบบ Food Connect (ลูกค้า)</div>
         <form onsubmit="registerCustomer(event)">
           <div class="form-group">
             <label>ชื่อ-นามสกุล</label>
@@ -142,7 +142,7 @@
         </div>
         <p style="font-size:0.9rem; color:var(--text-muted); margin-bottom:10px;" id="customerStatusText">กำลังส่งรายการอาหารไปที่ร้านค้า...</p>
         
-        <div style="font-weight:600; font-size:0.85rem; margin-top:10px;">🤖 Log การทำงานของระบบ AI Dispatcher:</div>
+        <div style="font-weight:600; font-size:0.85rem; margin-top:10px;">🤖 Log การทำงานของระบบ Food Connect AI:</div>
         <div class="ai-console" id="aiConsole">ระบบสแตนด์บาย...</div>
       </div>
     </div>
@@ -150,7 +150,7 @@
     <!-- ==================== 2. MERCHANT SECTION ==================== -->
     <div id="merchantSection" style="display:none;">
       <div class="card" id="merchantAuthCard">
-        <div class="card-title">🏪 ลงทะเบียนพาร์ทเนอร์ร้านค้า</div>
+        <div class="card-title">🏪 ลงทะเบียนพาร์ทเนอร์ร้านค้า Food Connect</div>
         <form onsubmit="registerMerchant(event)">
           <div class="section-subtitle">👤 ข้อมูลเจ้าของร้าน & การยืนยันตัวตน</div>
           <div class="form-row">
@@ -226,7 +226,7 @@
     <!-- ==================== 3. RIDER SECTION ==================== -->
     <div id="riderSection" style="display:none;">
       <div class="card" id="riderAuthCard">
-        <div class="card-title">🛵 ลงทะเบียนสมัครขับไรเดอร์</div>
+        <div class="card-title">🛵 สมัครขับไรเดอร์ Food Connect</div>
         <form onsubmit="registerRider(event)">
           <div class="section-subtitle">👤 ข้อมูลส่วนตัว (ต้องอายุไม่ต่ำกว่า 18 ปี)</div>
           <div class="form-row">
@@ -298,7 +298,7 @@
 
         <div style="background:var(--primary-light); padding:15px; border-radius:12px; margin-bottom:15px; display:flex; justify-content:space-between; align-items:center;">
           <div>
-            <div style="font-size:0.85rem; color:var(--text-muted);">กระเป๋าเงินไรเดอร์ (Rider Wallet)</div>
+            <div style="font-size:0.85rem; color:var(--text-muted);">กระเป๋าเงินไรเดอร์ (Food Connect Wallet)</div>
             <div style="font-size:1.5rem; font-weight:700; color:var(--primary-dark);" id="riderWalletMain">฿0.00</div>
           </div>
           <button class="btn btn-primary" style="width:auto; padding:8px 16px; font-size:0.85rem;" onclick="alert('ถอนเงินเข้าบัญชีธนาคารเรียบร้อยแล้ว!')">ถอนเงิน</button>
@@ -315,7 +315,7 @@
   <!-- Rider Incoming Order Popup Modal -->
   <div class="rider-incoming-modal" id="riderModal">
     <div class="incoming-card">
-      <div style="font-weight:700; color:var(--primary); font-size:0.9rem;">⚡ มีงานใหม่เข้ามา! (AI Dispatch)</div>
+      <div style="font-weight:700; color:var(--primary); font-size:0.9rem;">⚡ มีงานใหม่เข้ามา! (Food Connect AI)</div>
       <div class="price-big" id="incPrice">฿45.00</div>
       <div style="font-size:0.85rem; color:var(--text-muted);">รายได้ประมาณการค่ารอบของคุณ</div>
 
@@ -351,7 +351,7 @@
       document.getElementById('customerAuthCard').style.display = 'none';
       document.getElementById('customerAppCard').style.display = 'block';
       updateHeaderProfile('customer');
-      alert('✅ เข้าสู่ระบบลูกค้าสำเร็จ!');
+      alert('✅ เข้าสู่ระบบ Food Connect สำเร็จ!');
     }
 
     function registerMerchant(e) {
@@ -379,7 +379,7 @@
       document.getElementById('custFoodImg').src = users.merchant.img;
 
       updateHeaderProfile('merchant');
-      alert('✅ ลงทะเบียนพาร์ทเนอร์ร้านค้าเรียบร้อยแล้ว!');
+      alert('✅ ลงทะเบียนพาร์ทเนอร์ร้านค้า Food Connect เรียบร้อยแล้ว!');
     }
 
     function registerRider(e) {
@@ -405,7 +405,7 @@
       document.getElementById('riderAuthCard').style.display = 'none';
       document.getElementById('riderAppCard').style.display = 'block';
       updateHeaderProfile('rider');
-      alert('✅ ลงทะเบียนสมัครขับไรเดอร์เรียบร้อยแล้ว!');
+      alert('✅ ลงทะเบียนสมัครขับไรเดอร์ Food Connect เรียบร้อยแล้ว!');
     }
 
     function updateHeaderProfile(role) {
@@ -524,11 +524,11 @@
     // AI Dispatcher
     function runAIDispatcher() {
       currentOrder.status = "SEARCHING_RIDER";
-      updateCustomerUI('กำลังค้นหาไรเดอร์', 'AI กำลังจับคู่ไรเดอร์ที่อยู่ใกล้ที่สุด...', 'status-matching');
-      logAI(`[AI Match] ค้นหาไรเดอร์ในรัศมีใกล้เคียง...`);
+      updateCustomerUI('กำลังค้นหาไรเดอร์', 'Food Connect AI กำลังจับคู่ไรเดอร์ที่อยู่ใกล้ที่สุด...', 'status-matching');
+      logAI(`[Food Connect AI] ค้นหาไรเดอร์ในรัศมีใกล้เคียง...`);
 
       setTimeout(() => {
-        logAI(`[AI Broadcast] พบไรเดอร์ -> ส่งงานไปที่แอปไรเดอร์`);
+        logAI(`[Food Connect AI] พบไรเดอร์ -> ส่งงานไปที่แอปไรเดอร์`);
         document.getElementById('incPrice').innerText = `฿${currentOrder.riderFee}.00`;
         document.getElementById('modalStoreName').innerText = currentOrder.storeName;
         document.getElementById('modalCustName').innerText = currentOrder.customerName;
@@ -541,7 +541,7 @@
     // Rider Actions
     function rejectJob() {
       document.getElementById('riderModal').style.display = 'none';
-      logAI(`[AI Dispatch] ไรเดอร์ปฏิเสธงาน -> ค้นหาไรเดอร์ถัดไป...`);
+      logAI(`[Food Connect AI] ไรเดอร์ปฏิเสธงาน -> ค้นหาไรเดอร์ถัดไป...`);
       setTimeout(() => { runAIDispatcher(); }, 1500);
     }
 
@@ -624,7 +624,7 @@
       riderWallet += currentOrder.riderFee;
       document.getElementById('riderWalletMain').innerText = `฿${riderWallet}.00`;
 
-      updateCustomerUI('ส่งอาหารสำเร็จ 🎉', 'ขอบคุณที่ใช้บริการ! อาหารส่งถึงมือเรียบร้อยแล้ว', 'status-completed');
+      updateCustomerUI('ส่งอาหารสำเร็จ 🎉', 'ขอบคุณที่ใช้บริการ Food Connect! อาหารส่งถึงมือเรียบร้อยแล้ว', 'status-completed');
       logAI(`ส่งอาหารสำเร็จ! บันทึกรายได้ +฿${currentOrder.riderFee} เข้ากระเป๋าไรเดอร์ ${users.rider.name}`);
 
       renderRiderActiveJob();
