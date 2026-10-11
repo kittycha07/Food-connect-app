@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Food Connect System</title>
+  <title>Food Connect - System</title>
   <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
@@ -109,13 +109,13 @@
             <label>ที่อยู่จัดส่งประจำ</label>
             <input type="text" class="form-control" id="custAddress" placeholder="คอนโด A เสาชิงช้า กรุงเทพฯ" required>
           </div>
-          <button type="submit" class="btn btn-primary">เข้าใช้งานในฐานะลูกค้า</button>
+          <button type="submit" class="btn btn-primary">เข้าใช้งาน Food Connect</button>
         </form>
       </div>
 
       <div class="card" id="customerAppCard" style="display:none;">
         <div class="card-title">
-          <span id="custStoreTitle">🛒 สั่งอาหาร</span>
+          <span id="custStoreTitle">🛒 สั่งอาหาร (Food Connect)</span>
           <span class="status-badge status-completed">เปิดให้บริการ</span>
         </div>
         
@@ -209,7 +209,7 @@
             </div>
           </div>
 
-          <button type="submit" class="btn btn-primary" style="margin-top:10px;">ลงทะเบียนเปิดร้านค้า</button>
+          <button type="submit" class="btn btn-primary" style="margin-top:10px;">ลงทะเบียนเปิดร้านค้า Food Connect</button>
         </form>
       </div>
 
@@ -286,19 +286,19 @@
             <input type="text" class="form-control" id="riderDocInfo" placeholder="เช่น เล่มทะเบียนสีรายการ / เอกสารโอนสิทธิ์" required>
           </div>
 
-          <button type="submit" class="btn btn-primary" style="margin-top:10px;">สมัครเป็นไรเดอร์</button>
+          <button type="submit" class="btn btn-primary" style="margin-top:10px;">สมัครเป็นไรเดอร์ Food Connect</button>
         </form>
       </div>
 
       <div class="card" id="riderAppCard" style="display:none;">
         <div class="card-title">
-          <span>🛵 สถานะการทำงานของไรเดอร์</span>
+          <span>🛵 สถานะการทำงานไรเดอร์ (Food Connect)</span>
           <span class="status-badge status-completed">🟢 ออนไลน์</span>
         </div>
 
         <div style="background:var(--primary-light); padding:15px; border-radius:12px; margin-bottom:15px; display:flex; justify-content:space-between; align-items:center;">
           <div>
-            <div style="font-size:0.85rem; color:var(--text-muted);">กระเป๋าเงินไรเดอร์ (Food Connect Wallet)</div>
+            <div style="font-size:0.85rem; color:var(--text-muted);">กระเป๋าเงิน (Food Connect Wallet)</div>
             <div style="font-size:1.5rem; font-weight:700; color:var(--primary-dark);" id="riderWalletMain">฿0.00</div>
           </div>
           <button class="btn btn-primary" style="width:auto; padding:8px 16px; font-size:0.85rem;" onclick="alert('ถอนเงินเข้าบัญชีธนาคารเรียบร้อยแล้ว!')">ถอนเงิน</button>
@@ -448,7 +448,7 @@
     // Customer Actions
     function placeOrder() {
       if (!users.customer) {
-        alert('กรุณาลงทะเบียนเข้าสู่ระบบฝั่งลูกค้าก่อนสั่งซื้อครับ');
+        alert('กรุณาลงทะเบียนเข้าสู่ระบบ Food Connect ฝั่งลูกค้าก่อนสั่งซื้อครับ');
         return;
       }
 
@@ -506,7 +506,7 @@
           ${currentOrder.status === 'PENDING_MERCHANT' ? `
             <button class="btn btn-primary" onclick="merchantAcceptOrder()">👨‍🍳 ร้านค้ากดรับออเดอร์ & ทำอาหาร</button>
           ` : `
-            <div style="color:var(--primary); font-weight:600; font-size:0.85rem;">กำลังทำอาหาร / AI กำลังตามไรเดอร์...</div>
+            <div style="color:var(--primary); font-weight:600; font-size:0.85rem;">กำลังทำอาหาร / Food Connect AI กำลังตามไรเดอร์...</div>
           `}
         </div>
       `;
